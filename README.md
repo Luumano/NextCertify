@@ -1,13 +1,14 @@
 # NextCertify
 
-Para instalar as dependências use
+Para instalar as dependências, use:
 ```
-npm installl
+npm install
 ```
 
-Para executar como teste use
+Para executar o projeto em modo de desenvolvimento, use:
+>>>>>>> d551d93 (update README)
 ```
 npm run dev
 ```
 
-E clique na url do localhost fornecida no terminal
+Abra a URL do localhost exibida no terminal.
