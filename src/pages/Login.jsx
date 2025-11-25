@@ -3,8 +3,8 @@ import { Container, Row, Col, Form, Image } from "react-bootstrap";
 import { Link, useNavigate } from 'react-router-dom';
 import { MdSupportAgent } from "react-icons/md";
 
-import '../css/form-pages.css';
-import '../css/forms.css';
+// import '../css/form-pages.css';
+// import '../css/forms.css';
 
 import LoginIgm from '../img/login.png';
 
@@ -29,7 +29,7 @@ function Login() {
     return (
         <div style={{ 
             minHeight: '100vh', 
-            background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)', 
+            background: 'linear-gradient(135deg, #00C6FF, #0072FF)', 
             backgroundColor: '#00b0c8',
             display: 'flex',
             alignItems: 'center',
@@ -83,7 +83,7 @@ function Login() {
                                         label="Lembrar-me" 
                                         className="remember" 
                                     />
-                                    <Link to="/redefinir-senha" class="text-decoration-none small text-muted">
+                                    <Link to="/redefinir-senha" class="text-decoration-none small">
                                         Esqueceu a senha?
                                     </Link>
                                 </div>
@@ -96,7 +96,7 @@ function Login() {
                                 </div>
 
                                 <div className="d-flex justify-content-center align-items-center gap-3 mt-4">
-                                    <Link to="/contato" className="d-flex align-items-center gap-2 text-decoration-none text-secondary">
+                                    <Link to="/contato" className="d-flex align-items-center gap-2 text-decoration-none">
                                         <MdSupportAgent size={24} />
                                         <span>Atendimento ao cliente</span>
                                     </Link>

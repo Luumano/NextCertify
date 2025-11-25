@@ -55,7 +55,7 @@ function HomeAluno() {
                             <div>
                                 <h2 className="mb-1 fw-bold">João da Silva</h2>
                                 <Badge bg="light" text="primary" className="mb-2 px-3 py-1">Aluno</Badge>
-                                <p className="mb-0 opacity-75">Entusiasta de eventos e networking.</p>
+                                <p className="mb-0 text-light">Entusiasta de eventos e networking.</p>
                             </div>
                         </Col>
                         <Col md={4} className="text-md-end mt-3 mt-md-0">
