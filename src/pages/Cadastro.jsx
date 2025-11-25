@@ -26,12 +26,15 @@ function Cadastro() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
         if (dados.senha !== dados.confirmarSenha) {
             alert("As senhas não coincidem!");
             return;
         }
-        console.log("Dados:", dados);
-        alert("Cadastro realizado!");
+
+        console.log("Dados do Cadastro:", dados);
+        alert("Cadastro realizado com sucesso! Faça login.");
+        
         navigate('/');
     };
 

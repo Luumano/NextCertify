@@ -1,21 +1,30 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Routes, Route } from 'react-router-dom';
 
+// Importando todas as páginas
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
 import RedefinirSenha from './pages/RedefinirSenha';
 import VerificarCodigo from './pages/VerificarCodigo';
 import Contato from './pages/Contato';
 
+// Telas do Aluno
+import HomeAluno from './pages/HomeAluno';
+import MeusCertificados from './pages/MeusCertificados';
+import AvaliacaoTutoria from './pages/AvaliacaoTutoria';
+
 function App() {
   return (
     <Routes>
-      {/* Rotas Públicas */}
       <Route path="/" element={<Login />} />
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/redefinir-senha" element={<RedefinirSenha />} />
       <Route path="/verificar-codigo" element={<VerificarCodigo />} />
       <Route path="/contato" element={<Contato />} />
+
+      <Route path="/aluno" element={<HomeAluno />} />
+      <Route path="/meus-certificados" element={<MeusCertificados />} />
+      <Route path="/avaliacao-tutoria" element={<AvaliacaoTutoria />} />
     </Routes>
   );
 }

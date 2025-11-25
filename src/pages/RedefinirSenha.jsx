@@ -8,7 +8,7 @@ import BotaoPrincipal from '../components/BotaoPrincipal';
 
 import '../css/form-pages.css';
 import '../css/forms.css';
-import ImagemRedefinir from '../img/forgot_password.png'; // Confira o nome da imagem
+import ImagemRedefinir from '../img/forgot_password.png';
 
 function RedefinirSenha() {
     const navigate = useNavigate();
@@ -16,8 +16,11 @@ function RedefinirSenha() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Simula o envio do email e vai para a próxima etapa
+        
+        // Simulação de envio
         console.log("Enviando código para:", email);
+        
+        // Redireciona para a próxima etapa
         navigate('/verificar-codigo'); 
     };
 
@@ -68,7 +71,9 @@ function RedefinirSenha() {
                                 </div>
                                 
                                 <div className="text-center mt-3">
-                                    <Link to="/" className="text-muted small text-decoration-none">Voltar para o Login</Link>
+                                    <Link to="/" className="text-muted small text-decoration-none">
+                                        Voltar para o Login
+                                    </Link>
                                 </div>
 
                             </Form>

@@ -24,7 +24,7 @@ function Contato() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert(`Mensagem enviada por: ${form.nome}`);
+        alert(`Mensagem enviada com sucesso! Obrigado, ${form.nome}.`);
         navigate('/');
     };
 
@@ -82,7 +82,6 @@ function Contato() {
                                     <label htmlFor="mensagem">Sua Mensagem</label>
                                 </div>
 
-                                {/* Botão */}
                                 <div className="py-2">
                                      <BotaoPrincipal texto="Enviar Mensagem" type="submit" />
                                 </div>
