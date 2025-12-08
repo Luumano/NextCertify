@@ -1,35 +1,115 @@
 import { Container, Row, Col, Card, Button, Navbar, Nav, Form, Badge, Image } from 'react-bootstrap';
 import { FaBell, FaUserCircle, FaCloudUploadAlt, FaCalendarAlt, FaClock, FaDownload, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
 
 import LogoNextCertify from '../img/NextCertify.png';
 
 function MeusCertificados() {
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
 
-    const certificados = [
-        {
-            id: 1,
-            titulo: 'Monitoria 2025.1 - Sistemas Operacionais',
-            status: 'Aprovado',
-            periodo: '31/03 à 31/07/2025',
-            horas: '10 horas'
-        },
-        {
-            id: 2,
-            titulo: 'Monitoria 2025.1 - Sistemas Operacionais',
-            status: 'Negado',
-            periodo: '31/03 à 31/07/2025',
-            horas: '10 horas'
-        },
-        {
-            id: 3,
-            titulo: 'Monitoria 2025.1 - Sistemas Operacionais',
+    const [usuario, setUsuario] = useState();
+    const [titulo, setTitulo] = useState('');
+    const [certificados, setCertificados] = useState([]);
+
+    
+    useEffect(() => {
+        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+        if (usuarioLogado) {
+            setUsuario(usuarioLogado);
+        } else {
+            // Se preferir redirecionar automaticamente ao não logado, descomente:
+            // navigate('/');
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        if (!usuario) {
+            setCertificados([]);
+            return;
+        }
+        const key = `certificados_${usuario.id}`;
+        const stored = JSON.parse(localStorage.getItem(key)) || [];
+        setCertificados(stored);
+    }, [usuario]);
+
+    const persist = (arr) => {
+        if (!usuario) return;
+        const key = `certificados_${usuario.id}`;
+        localStorage.setItem(key, JSON.stringify(arr));
+    };
+
+   const handleSaveTitle = () => {
+        if (!usuario) {
+            alert('Você precisa estar logado para salvar certificados.');
+            return;
+        }
+        if (!titulo.trim()) return;
+        const novo = {
+            id: Date.now(),
+            titulo: titulo.trim(),
             status: 'Em espera',
-            periodo: '31/03 à 31/07/2025',
-            horas: '10 horas'
-        },
-    ];
+            periodo: '',
+            horas: '',
+            fileName: null,
+            fileData: null
+        };
+        const updated = [novo, ...certificados];
+        setCertificados(updated);
+        persist(updated);
+        setTitulo('');
+    };
+
+    const handleFileSelect = () => {
+        if (!usuario) {
+            alert('Faça login para enviar arquivos.');
+            return;
+        }
+        if (fileInputRef.current) fileInputRef.current.click();
+    };
+
+   const handleFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = reader.result;
+            const novo = {
+                id: Date.now(),
+                titulo: file.name,
+                status: 'Em espera',
+                periodo: '',
+                horas: '',
+                fileName: file.name,
+                fileData: dataUrl
+            };
+            const updated = [novo, ...certificados];
+            setCertificados(updated);
+            persist(updated);
+            e.target.value = null;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleRemove = (id) => {
+        const updated = certificados.filter(c => c.id !== id);
+        setCertificados(updated);
+        persist(updated);
+    };
+
+    const handleDownload = (cert) => {
+        if (!cert.fileData) {
+            alert('Nenhum arquivo disponível para download.');
+            return;
+        }
+        const link = document.createElement('a');
+        link.href = cert.fileData;
+        link.download = cert.fileName || `${cert.titulo}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -58,7 +138,7 @@ function MeusCertificados() {
                             <FaBell size={20} className="text-primary" />
                             <div className="d-flex align-items-center gap-2">
                                 <FaUserCircle size={32} className="text-primary" />
-                                <span className="fw-bold text-dark">João da Silva</span>
+                                <span className="fw-bold text-dark">{usuario ? usuario.name : 'Usuário'}</span>
                             </div>
                         </div>
                     </Navbar.Collapse>
@@ -69,17 +149,18 @@ function MeusCertificados() {
 
                 <div className="mb-4">
                     <h1 className="text-primary fw-bold mb-3">Meus Certificados</h1>
-                    <Button variant="primary" className="d-flex align-items-center gap-2 px-3 py-2 fw-medium">
+                    <Button variant="primary" className="d-flex align-items-center gap-2 px-3 py-2 fw-medium" onClick={handleFileSelect}>
                         <FaCloudUploadAlt size={20} />
                         Fazer upload do certificado
                     </Button>
+                    <input ref={fileInputRef} type="file" accept="application/pdf,image/*" style={{ display: 'none' }} onChange={handleFileChange} />
                 </div>
 
                 <div className="mb-5">
                     <label className="fw-bold text-primary mb-1 ms-1">Título</label>
                     <div className="d-flex gap-2">
-                        <Form.Control type="text" placeholder="Digite o título do Certificado" />
-                        <Button variant="primary" style={{ minWidth: '100px' }}>Salvar</Button>
+                        <Form.Control type="text" placeholder="Digite o título do Certificado"  value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+                        <Button variant="primary" style={{ minWidth: '100px' }} onClick={handleSaveTitle}>Salvar</Button>
                     </div>
                 </div>
 
@@ -97,20 +178,20 @@ function MeusCertificados() {
                                         </div>
                                         <div className="d-flex gap-4 text-muted">
                                             <div className="d-flex align-items-center gap-2">
-                                                <FaCalendarAlt /> {cert.periodo}
+                                                <FaCalendarAlt /> {cert.periodo || '-'}
                                             </div>
                                             <div className="d-flex align-items-center gap-2">
-                                                <FaClock /> {cert.horas}
+                                                <FaClock /> {cert.horas || '-'}
                                             </div>
                                         </div>
                                     </Col>
                                     <Col lg={4} className="text-lg-end mt-3 mt-lg-0">
                                         <div className="d-flex justify-content-lg-end gap-2">
-                                            <Button variant="primary" className="px-3">
-                                                Baixar Certificado
+                                            <Button variant="secondary" className="px-3" onClick={() => handleDownload(cert)}>
+                                                <FaDownload /> &nbsp; Baixar
                                             </Button>
-                                            <Button variant="danger" className="px-4">
-                                                Remover
+                                            <Button variant="danger" className="px-4" onClick={() => handleRemove(cert.id)}>
+                                                <FaTrash /> &nbsp; Remover
                                             </Button>
                                         </div>
                                     </Col>
