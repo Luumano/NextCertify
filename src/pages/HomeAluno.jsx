@@ -109,7 +109,7 @@ function HomeAluno() {
                                 </div>
                                 <h3 className="text-primary fw-bold mb-3">Upload de certificados</h3>
                                 <p className="text-muted mb-4">
-                                    Realizar o upload de certificados emitidos pelo Sistema de Eventos da UFC
+                                    Upload de certificados emitidos pelo Sistema de Eventos da UFC
                                 </p>
                                 <Button 
                                     variant="primary" 
