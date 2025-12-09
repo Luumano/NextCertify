@@ -13,6 +13,7 @@ import HomeAluno from './pages/HomeAluno';
 import MeusCertificados from './pages/MeusCertificados';
 import AvaliacaoTutoria from './pages/AvaliacaoTutoria';
 import Teste from './pages/teste';
+import EditarPerfil from './pages/EditarPerfil';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       <Route path="/aluno" element={<HomeAluno />} />
       <Route path="/meus-certificados" element={<MeusCertificados />} />
       <Route path="/avaliacao-tutoria" element={<AvaliacaoTutoria />} />
+      <Route path="/editar-perfil" element={<EditarPerfil />} />
     </Routes>
   );
 }

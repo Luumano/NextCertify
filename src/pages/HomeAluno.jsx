@@ -84,7 +84,7 @@ function HomeAluno() {
                             </div>
                         </Col>
                         <Col md={4} className="text-md-end mt-3 mt-md-0">
-                            <Button variant="outline-light" className="px-4 py-2 d-inline-flex align-items-center gap-2">
+                            <Button variant="outline-light" className="px-4 py-2 d-inline-flex align-items-center gap-2" onClick={() => navigate('/editar-perfil')}>
                                 Editar Perfil <FaPen size={12} />
                             </Button>
                         </Col>
