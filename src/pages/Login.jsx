@@ -6,12 +6,15 @@ import LoginIgm from '../img/login.png';
 import InputFlutuante from "../components/InputFlutuante";
 import BotaoPrincipal from "../components/BotaoPrincipal";
 import login from "../services/authService";
+import useAlert from '../hooks/useAlert';
+import AlertBox from '../components/AlertBox';
 
 function Login() {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
+    const { show, message, variant, key, handleAlert } = useAlert();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,7 +27,7 @@ function Login() {
 
             navigate('/aluno');
         } catch (error) {
-            alert(error.message);
+            handleAlert(error.message);
         }
     };
 
@@ -86,6 +89,13 @@ function Login() {
                                         Esqueceu a senha?
                                     </Link>
                                 </div>
+
+                                <AlertBox
+                                    show={show}
+                                    message={message}
+                                    variant={variant}
+                                    key={key}
+                                />
 
                                 <div className="py-2">
                                     <BotaoPrincipal
