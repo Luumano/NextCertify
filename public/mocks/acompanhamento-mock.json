@@ -1,0 +1,100 @@
+{
+  "usuario": {
+    "id": 1,
+    "name": "Coordenador Geral",
+    "role": "admin"
+  },
+  "tutores": [
+    {
+      "id": 101,
+      "nome": "Luiz Marcelo de Oliveira",
+      "ativo": true,
+      "pendente": false,
+      "email": "luiz@nextcertify.com"
+    },
+    {
+      "id": 102,
+      "nome": "Ana Paula Souza",
+      "ativo": true,
+      "pendente": true,
+      "email": "ana@nextcertify.com"
+    },
+    {
+      "id": 103,
+      "nome": "Carlos Eduardo",
+      "ativo": true,
+      "pendente": true,
+      "email": "carlos@nextcertify.com"
+    },
+    {
+      "id": 104,
+      "nome": "Beatriz Santos",
+      "ativo": true,
+      "pendente": false,
+      "email": "beatriz@nextcertify.com"
+    }
+  ],
+  "relatoriosEnviados": [
+    {
+      "id": 5001,
+      "tutorId": 101,
+      "aluno": "João Silva de Lima Barreto",
+      "dataSubmissao": "10/05/2025",
+      "detalhes": {
+        "virtuais": 3,
+        "presenciais": 1,
+        "dificuldadeId": "gestao_tempo",
+        "dificuldadeLabel": "Gestão de Tempo",
+        "descricao": "O aluno apresenta dificuldades em organizar o cronograma de estudos devido ao trabalho integral."
+      }
+    },
+    {
+      "id": 5002,
+      "tutorId": 104,
+      "aluno": "Maria Eduarda Ferreira",
+      "dataSubmissao": "08/05/2025",
+      "detalhes": {
+        "virtuais": 2,
+        "presenciais": 2,
+        "dificuldadeId": "conteudo_tecnico",
+        "dificuldadeLabel": "Conteúdo Técnico",
+        "descricao": "Dificuldade na compreensão de lógica de programação e arrays."
+      }
+    }
+  ],
+  "stats": {
+    "global": {
+      "metricas": [
+        { "id": "m1", "label": "Total Alunos", "val": "150", "icon": "👥" },
+        { "id": "m2", "label": "Encontros Mes", "val": "420", "icon": "📅" },
+        { "id": "m3", "label": "Pendências", "val": "12", "icon": "⚠️" }
+      ],
+      "graficos": [
+        { "name": "Sem 1", "online": 40, "presencial": 24 },
+        { "name": "Sem 2", "online": 30, "presencial": 13 },
+        { "name": "Sem 3", "online": 20, "presencial": 98 },
+        { "name": "Sem 4", "online": 27, "presencial": 39 }
+      ],
+      "dificuldades": [
+        { "titulo": "Conteúdo Técnico", "perc": "45%", "icon": "💻", "desc": "Dificuldade em sintaxe" },
+        { "titulo": "Gestão de Tempo", "perc": "30%", "icon": "⏰", "desc": "Conciliar trabalho" }
+      ]
+    },
+    "101": {
+      "metricas": [
+        { "label": "Alunos Atendidos", "val": "5", "icon": "👥" },
+        { "label": "Encontros Realizados", "val": "12", "icon": "📅" },
+        { "label": "Status Entrega", "val": "Em dia", "icon": "✅" }
+      ],
+      "graficos": [
+        { "name": "Sem 1", "online": 2, "presencial": 1 },
+        { "name": "Sem 2", "online": 3, "presencial": 0 },
+        { "name": "Sem 3", "online": 1, "presencial": 2 },
+        { "name": "Sem 4", "online": 2, "presencial": 1 }
+      ],
+      "dificuldades": [
+        { "titulo": "Gestão de Tempo", "perc": "80%", "icon": "⏰", "desc": "Problemas com horários" }
+      ]
+    }
+  }
+}

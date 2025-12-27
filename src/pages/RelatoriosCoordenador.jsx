@@ -260,8 +260,8 @@ function RelatoriosCoordenador() {
                             <ResponsiveContainer width="100%" height={200}>
                                 <LineChart data={dadosDashboard.horasCertificado}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis datakey="name" />
-                                    <YAxis />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                    <YAxis axisLine={false} tickLine={false} />
                                     <Tooltip />
                                     <Line type="monotone" dataKey="estudos" stroke="#2563eb" strokeWidth={3} />
                                     <Line type="monotone" dataKey="eventos" stroke="#06b6d4" strokeWidth={3} />
@@ -355,7 +355,8 @@ function RelatoriosCoordenador() {
                     <FaFileCsv /> Baixar CSV
                 </Button>
             </div>
-        </Container><footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
+        </Container>
+        <footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
                 <Container><h5 className="mb-0">© 2025 - NextCertify</h5></Container>
             </footer>
         </div>
