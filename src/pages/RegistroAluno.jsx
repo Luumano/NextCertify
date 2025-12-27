@@ -2,8 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Table, Navbar, Nav, Container, Button, Image } from "react-bootstrap";
 import LogoNextCertify from '../img/NextCertify.png';
-import { TbReport } from "react-icons/tb";
+import { TbReport, TbReportAnalytics } from "react-icons/tb";
 import { FaBell, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import { MdReport } from "react-icons/md";
 
 function RegistroAluno() {
     const navigate = useNavigate();
@@ -77,8 +78,18 @@ function RegistroAluno() {
             <Container className="my-5 flex-grow-1">
                 <h1 className="text-primary fw-bold mb-3">Registro de Alunos</h1>
 
+                <div className="d-flex justify-content-end mb-3">
+                    <Button
+                        variant="primary"
+                        className="px-4 py-2 d-flex justify-content-center align-items-center gap-1"
+                    >
+                        <TbReportAnalytics size={25} className="text-light" />
+                        <span>Relatório geral</span>
+                    </Button>
+                </div>
+
                 <Table hover responsive className="text-center">
-                    <thead className="bg-primary text-white">
+                    <thead>
                         <tr>
                             <th style={theadPrimary}>#</th>
                             <th style={theadPrimary}>Aluno(a)</th>

@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import LogoNextCertify from '../img/NextCertify.png';
 import { useState, useEffect } from 'react';
 import { FaUserCircle, FaFilePdf, FaFileCsv, FaSignOutAlt } from 'react-icons/fa';
-import { FaBell } from 'react-icons/fa6'; 
+import { FaBell } from 'react-icons/fa6';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import mockData from '../mock/relatorio-mock.json';
+import mockData from '/public/mocks/relatorio-mock';
 
 
 function RelatoriosCoordenador() {
     const navigate = useNavigate();
-    
+
     // Estados inicializados como vazios
     const [dadosDashboard, setDadosDashboard] = useState({
         usuario: { name: "" },
@@ -23,12 +23,12 @@ function RelatoriosCoordenador() {
         dificuldades: []
     });
 
-useEffect(() => {
-    setDadosDashboard({
-        ...mockData,
-        usuario: { name: "Coordenador Geral" }
-    });
-}, []);
+    useEffect(() => {
+        setDadosDashboard({
+            ...mockData,
+            usuario: { name: "Coordenador Geral" }
+        });
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem("usuarioLogado");
@@ -40,7 +40,7 @@ useEffect(() => {
     const valueStyle = { fontSize: '1.2rem', fontWeight: '500', color: '#555' };
 
     return (
-    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             {/* Navbar */}
             <Navbar bg="white" expand="lg" className="shadow-sm py-3 mb-4">
                 <Container fluid className="px-5">
@@ -108,7 +108,7 @@ useEffect(() => {
                             </ResponsiveContainer>
                         </Card>
                     </Col>
-                
+
                     <Col md={6}>
                         <Card className="border-0 shadow-sm p-3 h-100">
                             <h6 className="fw-bold text-dark">Experiência da Tutoria</h6>
@@ -126,22 +126,22 @@ useEffect(() => {
                     </Col>
 
                     <Col md={6}>
-                    <Card className="border-0 shadow-sm p-3 h-100">
-                        <h6 className="fw-bold text-dark">Horas por Certificados</h6>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <LineChart data={dadosDashboard.horasCertificado}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                <XAxis datakey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="estudos" stroke="#2563eb" strokeWidth={3} />
-                                <Line type="monotone" dataKey="eventos" stroke="#06b6d4" strokeWidth={3} />
-                                <Line type="monotone" dataKey="monitoria" stroke="#6366f1" strokeWidth={3} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </Card>
-                </Col>
-            </Row>
+                        <Card className="border-0 shadow-sm p-3 h-100">
+                            <h6 className="fw-bold text-dark">Horas por Certificados</h6>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <LineChart data={dadosDashboard.horasCertificado}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis datakey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Line type="monotone" dataKey="estudos" stroke="#2563eb" strokeWidth={3} />
+                                    <Line type="monotone" dataKey="eventos" stroke="#06b6d4" strokeWidth={3} />
+                                    <Line type="monotone" dataKey="monitoria" stroke="#6366f1" strokeWidth={3} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </Card>
+                    </Col>
+                </Row>
 
                 {/* Tabela e Lista de Dificuldades */}
                 <Row className="mb-5 g-4">
@@ -186,50 +186,50 @@ useEffect(() => {
                             </Table>
                         </Card>
                     </Col>
-                
-                <Col md={6}>
-                    <Card className="border-0 shadow-sm p-3 h-100">
-                        <h6 className="fw-bold text-dark">Apresentou Dificuldades</h6>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <BarChart data={dadosDashboard.dificuldadesGrafico}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="sim" fill="#2563eb" radius={[4, 4, 0, 0]}/>
-                                <Bar dataKey="nao" fill="#9ca3af" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </Card>
-                </Col>
 
-                <Col md={6}>
-                    <Card className="border-0 shadow-sm p-3">
-                        <h6 className="fw-bold mb-3">Maiores dificuldades dos tutorandos</h6>
-                        <ListGroup variant="flush">
-                            {dadosDashboard.dificuldades.map((dif, i) => (
-                                <ListGroup.Item key={i} className="d-flex justify-content-between align-items-center border-0 px-0 mb-2">
-                                    <div>{dif.icon} <strong>{dif.titulo}</strong><br /><small className="text-muted">{dif.desc}</small></div>
-                                    <span className="fw-bold text-primary">{dif.perc}</span>
-                                </ListGroup.Item>
-                            ))}
-                        </ListGroup>
-                    </Card>
-                </Col>
+                    <Col md={6}>
+                        <Card className="border-0 shadow-sm p-3 h-100">
+                            <h6 className="fw-bold text-dark">Apresentou Dificuldades</h6>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <BarChart data={dadosDashboard.dificuldadesGrafico}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Bar dataKey="sim" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="nao" fill="#9ca3af" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Card>
+                    </Col>
+
+                    <Col md={6}>
+                        <Card className="border-0 shadow-sm p-3">
+                            <h6 className="fw-bold mb-3">Maiores dificuldades dos tutorandos</h6>
+                            <ListGroup variant="flush">
+                                {dadosDashboard.dificuldades.map((dif, i) => (
+                                    <ListGroup.Item key={i} className="d-flex justify-content-between align-items-center border-0 px-0 mb-2">
+                                        <div>{dif.icon} <strong>{dif.titulo}</strong><br /><small className="text-muted">{dif.desc}</small></div>
+                                        <span className="fw-bold text-primary">{dif.perc}</span>
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        </Card>
+                    </Col>
                 </Row>
 
-            <div className="d-flex gap-3 mb-5">
-                <Button variant="primary" className="px-5 py-2 fw-bold d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#1a56db' }}>
-                    <FaFilePdf /> Baixar PDF
-                </Button>
-                <Button variant="info" className="px-5 py-2 fw-bold text-white d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#06b6d4' }}>
-                    <FaFileCsv /> Baixar CSV
-                </Button>
-            </div>
-        </Container><footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
+                <div className="d-flex gap-3 mb-5">
+                    <Button variant="primary" className="px-5 py-2 fw-bold d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#1a56db' }}>
+                        <FaFilePdf /> Baixar PDF
+                    </Button>
+                    <Button variant="info" className="px-5 py-2 fw-bold text-white d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#06b6d4' }}>
+                        <FaFileCsv /> Baixar CSV
+                    </Button>
+                </div>
+            </Container><footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
                 <Container><h5 className="mb-0">© 2025 - NextCertify</h5></Container>
             </footer>
-         </div>  
+        </div>
     );
 }
 
