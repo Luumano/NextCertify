@@ -6,6 +6,9 @@ import { FaUserCircle, FaFilePdf, FaFileCsv, FaSignOutAlt } from 'react-icons/fa
 import { FaBell } from 'react-icons/fa6';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import mockData from '/public/mocks/relatorio-mock';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 
 
 function RelatoriosCoordenador() {
@@ -24,15 +27,141 @@ function RelatoriosCoordenador() {
     });
 
     useEffect(() => {
-        setDadosDashboard({
-            ...mockData,
-            usuario: { name: "Coordenador Geral" }
+            setDadosDashboard({
+                ...mockData,
+                usuario: { name: "Coordenador Geral" }
+            });
+        }, []);
+
+    const downloadCSV = () => {
+        let csv = "";
+
+        // Título do CSV
+        csv += "Relatório de Gestão Geral\n\n";
+
+        //resumo e métricas
+        csv += "Resumo Geral\n";
+        csv += "Indicador,Valor\n";
+        dadosDashboard.metricas.forEach(m => {
+            csv += `${m.label},${m.val}\n`
         });
-    }, []);
+
+        csv += "\n";
+
+        //Tutorandos
+        csv += "Tutorandos\n";
+        csv += "Matrícula,Nome,Encontros,Semestre\n";
+        dadosDashboard.tutorandos.forEach(t => {
+            csv += `${t.id},${t.nome},${t.encontros},${t.semestre}\n`
+        });
+
+        csv += "\n";
+
+        //Tutores
+        if(dadosDashboard.tutores?.length) {
+            csv += "Tutores\n";
+            csv += "Nome,Encontros\n";
+            dadosDashboard.tutores.forEach(t => {
+                csv += `${t.nome},${t.encontros}\n`;
+            });
+            csv += "\n";
+        }
+
+        //Dificuldades
+        csv += "Maiores Dificuldades dos Tutorandos\n";
+        csv += "Dificuldade,Percentual\n";
+        dadosDashboard.dificuldades.forEach(d => {
+            csv += `${d.titulo},${d.perc}\n`;
+        });
+
+        //Download
+        const blob = new Blob(["\uFEFF" + csv], {
+            type: "text/csv;charset=utf-8;"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "relatorio_gestao_geral.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const downloadPDF = () => {
+        const doc = new jsPDF();
+
+         // Título
+        doc.setFontSize(18);
+        doc.text("Relatório de Gestão Geral", 14, 20);
+
+        // Subtítulo
+        doc.setFontSize(12);
+        doc.text(`Coordenador: ${dadosDashboard.usuario.name}`, 14, 30);
+
+        // Métricas
+        doc.setFontSize(14);
+        doc.text("Resumo Geral", 14, 45);
+
+        autoTable(doc, {
+            startY: 50,
+            head: [["Indicador", "Valor"]],
+            body: dadosDashboard.metricas.map(m => [m.label, m.val])
+        });
+
+        // Tutorandos
+        doc.setFontSize(14);
+        doc.text(
+            "Tutorandos",
+            14,
+            doc.lastAutoTable.finalY + 15
+            );
+
+        autoTable(doc, {
+            startY: doc.lastAutoTable.finalY + 20,
+            head: [["Matrícula", "Nome", "Encontros", "Semestre"]],
+            body: dadosDashboard.tutorandos.map(t => [
+            t.id,
+            t.nome,
+            t.encontros,
+            t.semestre
+            ])
+        });
+
+        // Dificuldades
+        doc.setFontSize(14);
+            doc.text(
+                "Maiores Dificuldades dos Tutorandos",
+                14,
+                doc.lastAutoTable.finalY + 15
+        );
+
+        autoTable(doc, {
+            startY: doc.lastAutoTable.finalY + 20,
+            head: [["Dificuldade", "Percentual"]],
+            body: dadosDashboard.dificuldades.map(d => [
+            d.titulo,
+            d.perc
+            ])
+        });
+
+            // Rodapé
+        doc.setFontSize(10);
+            doc.text(
+                "© 2025 - NextCertify",
+                14,
+            doc.internal.pageSize.height - 10
+        );
+
+        doc.save("relatorio_gestao_geral.pdf");
+    };
+
+
 
     const handleLogout = () => {
-        localStorage.removeItem("usuarioLogado");
-        navigate('/');
+            localStorage.removeItem("usuarioLogado");
+            navigate('/');
     };
 
     const gradientStyle = { background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)', color: 'white' };
@@ -218,15 +347,15 @@ function RelatoriosCoordenador() {
                     </Col>
                 </Row>
 
-                <div className="d-flex gap-3 mb-5">
-                    <Button variant="primary" className="px-5 py-2 fw-bold d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#1a56db' }}>
-                        <FaFilePdf /> Baixar PDF
-                    </Button>
-                    <Button variant="info" className="px-5 py-2 fw-bold text-white d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#06b6d4' }}>
-                        <FaFileCsv /> Baixar CSV
-                    </Button>
-                </div>
-            </Container><footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
+            <div className="d-flex gap-3 mb-5">
+                <Button variant="primary" className="px-5 py-2 fw-bold d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#1a56db' }} onClick={downloadPDF}>
+                    <FaFilePdf /> Baixar PDF
+                </Button>
+                <Button variant="info" className="px-5 py-2 fw-bold text-white d-flex align-items-center gap-2 border-0" style={{ backgroundColor: '#06b6d4' }} onClick={downloadCSV}>
+                    <FaFileCsv /> Baixar CSV
+                </Button>
+            </div>
+        </Container><footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
                 <Container><h5 className="mb-0">© 2025 - NextCertify</h5></Container>
             </footer>
         </div>
