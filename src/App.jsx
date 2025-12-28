@@ -21,6 +21,9 @@ import HomeTutor from './pages/HomeTutor';
 import AlunosTutor from './pages/AlunosTutor';
 import FormsTutor from './pages/FormsTutor';
 import RelatoriosTutor from './pages/RelatoriosTutor';
+// Telas do Coordenador
+import HomeCoordenador from './pages/HomeCoordenador';
+import RelatoriosCoordenador from './pages/RelatoriosCoordenador';
 
 function App() {
   return (
@@ -44,6 +47,8 @@ function App() {
       <Route path="/forms-tutor" element={<FormsTutor />} />
       <Route path="/relatorios-tutor" element={<RelatoriosTutor />} />
 
+      <Route path="/coordenador" element={<HomeCoordenador />} />
+      <Route path="/relatorios-coordenador" element={<RelatoriosCoordenador />} />
     </Routes>
   );
 }
