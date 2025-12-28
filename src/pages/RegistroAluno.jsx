@@ -5,28 +5,10 @@ import LogoNextCertify from '../img/NextCertify.png';
 import { TbReport, TbReportAnalytics } from "react-icons/tb";
 import { FaBell, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import { MdReport } from "react-icons/md";
+import useAuthenticatedUser from "../hooks/useAuthenticatedUser";
 
 function RegistroAluno() {
-    const navigate = useNavigate();
-    const [usuario, setUsuario] = useState(null);
-
-    useEffect(() => {
-        //Não apagar por enquanto para realizar os testes
-        // Pegar os dados salvos no LocalStorage
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-
-        if (usuarioLogado) {
-            setUsuario(usuarioLogado);
-        } else {
-            // Vai retornar para login caso não tenha usuário logado
-            navigate('/');
-        }
-    }, [navigate]);
-
-    const handleLogout = () => {
-        localStorage.removeItem("usuarioLogado");
-        navigate('/');
-    };
+    const { usuario, handleLogout } = useAuthenticatedUser();
 
     const gradientStyle = {
         background: 'linear-gradient(135deg, #005bea 0%, #00c6fb 100%)',
@@ -39,7 +21,7 @@ function RegistroAluno() {
     };
 
     if (!usuario) {
-        return <div>Carregando...</div>;
+        return <div className="p-5 text-center">Carregando...</div>;
     }
 
     return (

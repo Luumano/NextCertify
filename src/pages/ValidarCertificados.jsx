@@ -2,7 +2,7 @@ import React, { useState, useEffect, use } from "react";
 import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Form, Badge, ButtonGroup, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaBell, FaSignOutAlt, FaCertificate, FaCheckCircle, FaTimesCircle, FaSearch, FaCalendarAlt, FaClock, FaListUl, FaExclamationTriangle, FaUndo } from 'react-icons/fa';
-import mockCertificados from '/public/mocks/certificados-mock.json';
+import mockCertificados from '/src/mocks/certificados-mock.json';
 import LogoNextCertify from '../img/NextCertify.png';
 
 function ValidarCertificados() {
@@ -11,7 +11,7 @@ function ValidarCertificados() {
     const [certificados, setCertificados] = useState([]);
     const [abaAtiva, setAbaAtiva] = useState("pendente");
     const [filtroCurso, setFiltroCurso] = useState("Sistemas de Informação");
-    const [usuario,setUsuario] = useState({ name: "Carregando...."});
+    const [usuario, setUsuario] = useState({ name: "Carregando...." });
 
     const [showModalNegar, setShowModalNegar] = useState(false);
     const [certSelecionado, setCertSelecionado] = useState(null);
@@ -28,7 +28,7 @@ function ValidarCertificados() {
 
     useEffect(() => {
         const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-        if(usuarioLogado){
+        if (usuarioLogado) {
             setUsuario(usuarioLogado);
         } else {
             navigate("/");
@@ -41,7 +41,7 @@ function ValidarCertificados() {
             status: 'pendente',
             observacao: ''
         }));
-        setCertificados(dadosIniciais);   
+        setCertificados(dadosIniciais);
     }, [navigate]);
 
     const handleLogout = () => {
@@ -50,7 +50,7 @@ function ValidarCertificados() {
     };
 
     const handleAprovar = (id) => {
-        setCertificados(prev => prev.map(c => c.id === id ? { ...c, status: 'aprovado', observacao: '' } : c ));
+        setCertificados(prev => prev.map(c => c.id === id ? { ...c, status: 'aprovado', observacao: '' } : c));
     };
 
     const abrirModalNegar = (cert) => {
@@ -59,11 +59,11 @@ function ValidarCertificados() {
     };
 
     const confirmarNegativa = () => {
-        if(!motivoNegativa.trim()) {
+        if (!motivoNegativa.trim()) {
             alert("Por favor, descreva ou selecione o motivo da rejeição");
             return;
         }
-        setCertificados(prev => prev.map(c => c.id === certSelecionado.id ? { ...c, status: 'negado', observacao: motivoNegativa } : c ));
+        setCertificados(prev => prev.map(c => c.id === certSelecionado.id ? { ...c, status: 'negado', observacao: motivoNegativa } : c));
         fecharModal();
     };
 
@@ -74,36 +74,36 @@ function ValidarCertificados() {
     };
 
     const handleReverter = (id) => {
-        setCertificados(prev => prev.map(c => c.id === id ? { ...c, status: 'pendente', observacao: ''} : c  ));
+        setCertificados(prev => prev.map(c => c.id === id ? { ...c, status: 'pendente', observacao: '' } : c));
     };
 
     const gradientStyle = { background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)', color: 'white' };
     const certificadosFiltrados = certificados.filter(c => c.status === abaAtiva);
 
-    return(
+    return (
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Navbar bg="white" expand="lg" className="shadow-sm py-3 mb-0">
                 <Container fluid className="px-5">
                     <Navbar.Brand href="#"><Image src={LogoNextCertify} alt="Logo" height="40" /></Navbar.Brand>
-                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                            <Navbar.Collapse id="basic-navbar-nav">
-                                <Nav className="text-center mx-auto fw-medium">
-                                    <Nav.Link href="#" className="mx-2 text-dark">Alunos</Nav.Link>
-                                    <Nav.Link href="#" className="mx-2 text-dark">Tutores</Nav.Link>
-                                    <Nav.Link href="#" className="mx-2 text-dark">Predefinições</Nav.Link>
-                                    <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
-                                </Nav>
-                                <div className="d-flex align-items-center gap-3">
-                                    <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
-                                        <div className="d-flex align-items-center gap-2">
-                                            <FaUserCircle size={32} className="text-primary" />
-                                            <span className="fw-bold text-dark">{usuario.name}</span>
-                                        </div>
-                                        <Button variant="outline-danger" size="sm" onClick={handleLogout} className="d-flex align-items-center gap-2">
-                                            <FaSignOutAlt size={16} /> Sair
-                                        </Button>
-                                </div>
-                            </Navbar.Collapse>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="text-center mx-auto fw-medium">
+                            <Nav.Link href="#" className="mx-2 text-dark">Alunos</Nav.Link>
+                            <Nav.Link href="#" className="mx-2 text-dark">Tutores</Nav.Link>
+                            <Nav.Link href="#" className="mx-2 text-dark">Predefinições</Nav.Link>
+                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+                        </Nav>
+                        <div className="d-flex align-items-center gap-3">
+                            <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
+                            <div className="d-flex align-items-center gap-2">
+                                <FaUserCircle size={32} className="text-primary" />
+                                <span className="fw-bold text-dark">{usuario.name}</span>
+                            </div>
+                            <Button variant="outline-danger" size="sm" onClick={handleLogout} className="d-flex align-items-center gap-2">
+                                <FaSignOutAlt size={16} /> Sair
+                            </Button>
+                        </div>
+                    </Navbar.Collapse>
                 </Container>
             </Navbar>
 
@@ -177,8 +177,8 @@ function ValidarCertificados() {
                                                     </div>
                                                 )}
                                                 <div className="d-flex gap-4 mt-2">
-                                                    <span className="small text-muted fw-bold"><FaCalendarAlt className="me-1 text-primary"/> {cert.periodo}</span>
-                                                    <span className="small text-muted fw-bold"><FaClock className="me-1 text-primary"/> {cert.horas}</span>
+                                                    <span className="small text-muted fw-bold"><FaCalendarAlt className="me-1 text-primary" /> {cert.periodo}</span>
+                                                    <span className="small text-muted fw-bold"><FaClock className="me-1 text-primary" /> {cert.horas}</span>
                                                 </div>
                                             </Col>
 
@@ -191,7 +191,7 @@ function ValidarCertificados() {
                                                         <Button variant="danger" className="fw-bold" onClick={() => abrirModalNegar(cert)}><FaTimesCircle className="me-1" /> Negar</Button>
                                                     </>
                                                 ) : (
-                                                    <Button variant="outline-secondary" size="sm" onClick={() => handleReverter(cert.id)}><FaUndo className="me-1"/> Reverter para Pendente</Button>
+                                                    <Button variant="outline-secondary" size="sm" onClick={() => handleReverter(cert.id)}><FaUndo className="me-1" /> Reverter para Pendente</Button>
                                                 )}
                                             </Col>
                                         </Row>
@@ -213,7 +213,7 @@ function ValidarCertificados() {
                 </Modal.Header>
                 <Modal.Body className="p-4">
                     <p className="mb-3 text-muted">O certificado <strong>{certSelecionado?.titulo}</strong> será enviado para o histórico do aluno como <strong>Negado</strong>
-                    Por favor, selecione ou descreva o motivo:</p>
+                        Por favor, selecione ou descreva o motivo:</p>
 
                     <Form.Group className="mb-4">
                         <Form.Label className="fw-bold">Motivos Comuns:</Form.Label>

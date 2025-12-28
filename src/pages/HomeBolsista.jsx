@@ -1,31 +1,11 @@
 import { Container, Row, Col, Card, Button, Navbar, Nav, Badge, Image } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import LogoNextCertify from '../img/NextCertify.png';
-import { useState, useEffect } from 'react';
 import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher, FaFile, FaCertificate } from 'react-icons/fa';
 import { FaUserGear, FaBell } from 'react-icons/fa6';
+import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 
 function HomeBolsista() {
-    const navigate = useNavigate();
-    const [usuario, setUsuario] = useState(null);
-
-    useEffect(() => {
-        //Não apagar por enquanto para realizar os testes
-        // Pegar os dados salvos no LocalStorage
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-
-        if (usuarioLogado) {
-            setUsuario(usuarioLogado);
-        } else {
-            // Vai retornar para login caso não tenha usuário logado
-            navigate('/');
-        }
-    }, [navigate]);
-
-    const handleLogout = () => {
-        localStorage.removeItem("usuarioLogado");
-        navigate('/');
-    };
+    const { usuario, handleLogout } = useAuthenticatedUser();
 
     const gradientStyle = {
         background: 'linear-gradient(135deg, #005bea 0%, #00c6fb 100%)',
@@ -33,7 +13,7 @@ function HomeBolsista() {
     };
 
     if (!usuario) {
-        return <div>Carregando...</div>;
+        return <div className="p-5 text-center">Carregando...</div>;
     }
 
     return (
@@ -175,7 +155,7 @@ function HomeBolsista() {
                                     variant="primary"
                                     className="px-4 py-2 w-100"
                                     onClick={() => navigate('/acompanhamento-tutor')}
-                                    >
+                                >
                                     Veja mais
                                 </Button>
                             </Card.Body>
@@ -185,7 +165,7 @@ function HomeBolsista() {
                         <Card className="h-100 border-0 shadow-sm rounded-4 p-4">
                             <Card.Body>
                                 <div className="mb-3">
-                                    <FaCertificate size={60} className="mb-3" style={{ color: "#FFD43B" }}/>
+                                    <FaCertificate size={60} className="mb-3" style={{ color: "#FFD43B" }} />
                                 </div>
                                 <h3 className="text-primary fw-bold mb-3">Validação dos Certificados</h3>
                                 <p className="text-muted mb-4">Validação dos certificados enviados pelos alunos da tutoria.</p>
@@ -193,7 +173,7 @@ function HomeBolsista() {
                                     variant="primary"
                                     className="px-4 py-2 w-100"
                                     onClick={() => navigate('/validar-certificados')}
-                                    >
+                                >
                                     Veja mais
                                 </Button>
                             </Card.Body>

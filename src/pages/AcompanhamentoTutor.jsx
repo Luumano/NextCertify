@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Table, ListGroup
 import { useNavigate } from 'react-router-dom';
 import { FaUserCircle, FaFilePdf, FaFileCsv, FaSignOutAlt, FaBell, FaPaperPlane, FaEye } from 'react-icons/fa';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import mockData from '/public/mocks/acompanhamento-mock.json'; 
+import mockData from '/src/mocks/acompanhamento-mock.json'; 
 import LogoNextCertify from '../img/NextCertify.png';
 
 function AcompanhamentoTutor() {

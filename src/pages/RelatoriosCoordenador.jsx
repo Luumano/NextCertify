@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { FaUserCircle, FaFilePdf, FaFileCsv, FaSignOutAlt } from 'react-icons/fa';
 import { FaBell } from 'react-icons/fa6';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import mockData from '/public/mocks/relatorio-mock';
+import mockData from '/src/mocks/relatorio-mock.json';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 

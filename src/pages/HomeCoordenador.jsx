@@ -4,28 +4,11 @@ import LogoNextCertify from '../img/NextCertify.png';
 import { useState, useEffect } from 'react';
 import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher, FaFileAlt } from 'react-icons/fa';
 import { FaUserGear, FaBell } from 'react-icons/fa6';
+import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 
 function HomeCoordenador() {
     const navigate = useNavigate();
-    const [usuario, setUsuario] = useState(null);
-
-    useEffect(() => {
-        //Não apagar por enquanto para realizar os testes
-        // Pegar os dados salvos no LocalStorage
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-
-        if (usuarioLogado) {
-            setUsuario(usuarioLogado);
-        } else {
-            // Vai retornar para login caso não tenha usuário logado
-            navigate('/');
-        }
-    }, [navigate]);
-
-    const handleLogout = () => {
-        localStorage.removeItem("usuarioLogado");
-        navigate('/');
-    };
+    const { usuario, handleLogout } = useAuthenticatedUser();
 
     const gradientStyle = {
         background: 'linear-gradient(135deg, #005bea 0%, #00c6fb 100%)',
@@ -33,7 +16,7 @@ function HomeCoordenador() {
     };
 
     if (!usuario) {
-        return <div>Carregando...</div>;
+        return <div className="p-5 text-center">Carregando...</div>;
     }
 
     return (
@@ -173,7 +156,7 @@ function HomeCoordenador() {
                                 </div>
                                 <h3 className="text-primary fw-bold mb-3">Relatório de Gestão Geral</h3>
                                 <p className="text-muted mb-4">
-                                   Gerar relatório de gestão geral da Tutoria Acadêmica
+                                    Gerar relatório de gestão geral da Tutoria Acadêmica
                                 </p>
                                 <Button
                                     variant="primary"
@@ -194,7 +177,7 @@ function HomeCoordenador() {
                                 </div>
                                 <h3 className="text-primary fw-bold mb-3">Relatório de Individual do Tutor</h3>
                                 <p className="text-muted mb-4">
-                                   Gerar relatório individual do tutor da Tutoria Acadêmica
+                                    Gerar relatório individual do tutor da Tutoria Acadêmica
                                 </p>
                                 <Button
                                     variant="primary"

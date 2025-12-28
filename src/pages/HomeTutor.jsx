@@ -3,27 +3,12 @@ import { FaBell, FaUserCircle, FaSignOutAlt, FaPen, FaUserGraduate, FaClipboardL
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import LogoNextCertify from '../img/NextCertify.png';
+import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 
 function HomeTutor() {
     const navigate = useNavigate();
 
-    // carrega o user direto na inicialização pra evitar loop infinito
-    const [usuario] = useState(() => {
-        const saved = localStorage.getItem("usuarioLogado");
-        return saved ? JSON.parse(saved) : null;
-    });
-
-    useEffect(() => {
-        // se não tiver user, vai pro login
-        if (!usuario) {
-            navigate('/');
-        }
-    }, [usuario, navigate]);
-
-    const handleLogout = () => {
-        localStorage.removeItem("usuarioLogado");
-        navigate('/');
-    };
+   const { usuario, handleLogout } = useAuthenticatedUser();
 
     // gradiente igual ao do layout
     const gradientStyle = {

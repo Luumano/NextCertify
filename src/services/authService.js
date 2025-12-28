@@ -1,7 +1,7 @@
 import { getData } from "./api";
 
 async function login(email, password) {
-    const url = "/mocks/auth-mock.json";
+    const url = "/src/mocks/auth-mock.json";
 
     const data = await getData(url);
 
@@ -23,7 +23,7 @@ async function login(email, password) {
 
 
 async function register(name, matricula, email, password){
-    const url = "/mocks/auth-mock.json";
+    const url = "/src/mocks/auth-mock.json";
 
     const data = await getData(url);
 
