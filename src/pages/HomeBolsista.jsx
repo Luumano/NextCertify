@@ -2,7 +2,7 @@ import { Container, Row, Col, Card, Button, Navbar, Nav, Badge, Image } from 're
 import { useNavigate } from 'react-router-dom';
 import LogoNextCertify from '../img/NextCertify.png';
 import { useState, useEffect } from 'react';
-import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher } from 'react-icons/fa';
+import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher, FaFile, FaCertificate } from 'react-icons/fa';
 import { FaUserGear, FaBell } from 'react-icons/fa6';
 
 function HomeBolsista() {
@@ -158,6 +158,42 @@ function HomeBolsista() {
                                     className="px-4 py-2 w-100"
                                     onClick={() => navigate('')}
                                 >
+                                    Veja mais
+                                </Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4}>
+                        <Card className="h-100 border-0 shadow-sm rounded-4 p-4">
+                            <Card.Body>
+                                <div className="mb-3">
+                                    <FaFile size={60} className="text-secondary mb-3" />
+                                </div>
+                                <h3 className="text-primary fw-bold mb-3">Relatório de Acompanhamento dos Tutores</h3>
+                                <p className="text-muted mb-4">Relatório de acompanhamento dos tutores</p>
+                                <Button
+                                    variant="primary"
+                                    className="px-4 py-2 w-100"
+                                    onClick={() => navigate('/acompanhamento-tutor')}
+                                    >
+                                    Veja mais
+                                </Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4}>
+                        <Card className="h-100 border-0 shadow-sm rounded-4 p-4">
+                            <Card.Body>
+                                <div className="mb-3">
+                                    <FaCertificate size={60} className="mb-3" style={{ color: "#FFD43B" }}/>
+                                </div>
+                                <h3 className="text-primary fw-bold mb-3">Validação dos Certificados</h3>
+                                <p className="text-muted mb-4">Validação dos certificados enviados pelos alunos da tutoria.</p>
+                                <Button
+                                    variant="primary"
+                                    className="px-4 py-2 w-100"
+                                    onClick={() => navigate('/validar-certificados')}
+                                    >
                                     Veja mais
                                 </Button>
                             </Card.Body>
