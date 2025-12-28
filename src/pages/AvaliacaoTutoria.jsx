@@ -1,23 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Container, Row, Col, Button, Navbar, Nav, Form, Image } from 'react-bootstrap';
 import { FaBell, FaUserCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-
 import LogoNextCertify from '../img/NextCertify.png';
 
 function AvaliacaoTutoria() {
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({
-        nome: '',
-        data: '',
-        email: '',
-        curso: '',
-        permanecer: 'sim',
-        experiencia: 50,
-        dificuldade: '',
-        avaliacaoTutor: 50,
-        descricao: ''
+    const [formData, setFormData] = useState(() => {
+        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+        const today = new Date().toISOString().slice(0, 10);
+
+        return {
+            nome: usuarioLogado.name || '',
+            data: today,
+            email: usuarioLogado.email || '',
+            curso: '',
+            permanecer: 'sim',
+            experiencia: 50,
+            dificuldade: '',
+            avaliacaoTutor: 50,
+            descricao: ''
+        };
     });
 
     const handleChange = (e) => {
@@ -37,17 +41,7 @@ function AvaliacaoTutoria() {
         };
     };
 
-    // Vai preencher os campos com usuário logado e data atual
-    useEffect(() => {
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-        setFormData(prev => ({
-            ...prev,
-            nome: usuarioLogado?.name || prev.nome,
-            email: usuarioLogado?.email || prev.email,
-            data: prev.data || today
-        }));
-    }, []);
+    const nomeUsuarioNav = formData.nome || "Usuário";
 
     return (
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -82,7 +76,7 @@ function AvaliacaoTutoria() {
                             <FaBell size={20} className="text-primary" />
                             <div className="d-flex align-items-center gap-2">
                                 <FaUserCircle size={32} className="text-primary" />
-                                <span className="fw-bold text-dark">{JSON.parse(localStorage.getItem("usuarioLogado"))?.name || "usuário"}</span>
+                                <span className="fw-bold text-dark">{nomeUsuarioNav}</span>
                             </div>
                         </div>
                     </Navbar.Collapse>
@@ -106,12 +100,11 @@ function AvaliacaoTutoria() {
                                 <Form.Control
                                     type="text"
                                     id="nome"
-                                    placeholder="Digite seu nome completo"
                                     value={formData.nome}
                                     onChange={handleChange}
                                     readOnly
                                     disabled
-                                    required
+                                    className="bg-light"
                                 />
                             </Form.Group>
                         </Col>
@@ -124,7 +117,7 @@ function AvaliacaoTutoria() {
                                     value={formData.data}
                                     onChange={handleChange}
                                     disabled
-                                    required
+                                    className="bg-light"
                                 />
                             </Form.Group>
                         </Col>
@@ -137,12 +130,11 @@ function AvaliacaoTutoria() {
                                 <Form.Control
                                     type="email"
                                     id="email"
-                                    placeholder="seu.email@exemplo.com"
                                     value={formData.email}
                                     onChange={handleChange}
                                     readOnly
                                     disabled
-                                    required
+                                    className="bg-light"
                                 />
                             </Form.Group>
                         </Col>
@@ -273,7 +265,6 @@ function AvaliacaoTutoria() {
                     <h5 className="mb-0">© 2025 - NextCertify</h5>
                 </Container>
             </footer>
-
         </div>
     );
 }
