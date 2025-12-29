@@ -2,9 +2,11 @@ import { Container, Row, Col, Card, Button, Navbar, Nav, Badge, Image } from 're
 import LogoNextCertify from '../img/NextCertify.png';
 import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher, FaFile, FaCertificate } from 'react-icons/fa';
 import { FaUserGear, FaBell } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 
 function HomeBolsista() {
+    const navigate = useNavigate();
     const { usuario, handleLogout } = useAuthenticatedUser();
 
     const gradientStyle = {

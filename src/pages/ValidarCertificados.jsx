@@ -12,6 +12,7 @@ function ValidarCertificados() {
     const [abaAtiva, setAbaAtiva] = useState("pendente");
     const [filtroCurso, setFiltroCurso] = useState("Sistemas de Informação");
     const [usuario, setUsuario] = useState({ name: "Carregando...." });
+    const [buscaAluno, setBuscaAluno] = useState("");
 
     const [showModalNegar, setShowModalNegar] = useState(false);
     const [certSelecionado, setCertSelecionado] = useState(null);
@@ -36,12 +37,14 @@ function ValidarCertificados() {
 
         //Os certificados serão inicializados com o status de observação vazia
         //POR FAVOR NÃO APAGAR ESSA PARTE DO CÓDIGO ATÉ AUTORIZAÇÃO FINAL
-        const dadosIniciais = (mockCertificados || []).map(c => ({
-            ...c,
-            status: 'pendente',
-            observacao: ''
-        }));
-        setCertificados(dadosIniciais);
+            const listaGlobal = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
+
+            if(listaGlobal.length === 0 && mockCertificados) {
+                const iniciais = mockCertificados.map(c => ({ ...c, status: 'pendente', observacao: ''}));
+                setCertificados(iniciais);
+            } else {
+                setCertificados(listaGlobal);
+            }
     }, [navigate]);
 
     const handleLogout = () => {
@@ -49,8 +52,37 @@ function ValidarCertificados() {
         navigate("/");
     };
 
+
+    const handleVerPDF = (cert) => {
+        if(!cert.fileData) {
+            alert("Arquivo não encontrado ou corrompido.");
+            return;
+        }
+
+        try {
+            // Se estiver em formato Base64 (Data URL), será aberto diretamente
+            if(cert.fileData.startsWith('data:')){
+                const novaAba = window.open();
+                novaAba.document.write(
+                    `<iframe src="${cert.fileData}" frameborder="0" style="border:0; top:0px left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`
+                );
+            } else {
+                alert("Formato de arquivo inválido.");
+            }
+        } catch (error) {
+            console.error("Erro ao abrir PDF:", error);
+            alert("Não foi possível abrir o visualizador de PDF.");
+        }
+    };
+
+    const salvarCertificados = (listaAtualizado) => {
+        localStorage.setItem("lista_global_certificados", JSON.stringify(listaAtualizado));
+    };
+
     const handleAprovar = (id) => {
-        setCertificados(prev => prev.map(c => c.id === id ? { ...c, status: 'aprovado', observacao: '' } : c));
+        const novaLista = certificados.map(c => c.id === id ? { ...c, status: 'aprovado', observacao: '' } : c );
+        setCertificados(novaLista);
+        salvarCertificados(novaLista);
     };
 
     const abrirModalNegar = (cert) => {
@@ -63,7 +95,9 @@ function ValidarCertificados() {
             alert("Por favor, descreva ou selecione o motivo da rejeição");
             return;
         }
-        setCertificados(prev => prev.map(c => c.id === certSelecionado.id ? { ...c, status: 'negado', observacao: motivoNegativa } : c));
+        const novaLista = certificados.map(c => c.id === certSelecionado.id ? { ...c, status: 'negado', motivo: motivoNegativa } : c );
+        setCertificados(novaLista);
+        salvarCertificados(novaLista);
         fecharModal();
     };
 
@@ -148,7 +182,7 @@ function ValidarCertificados() {
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label className="fw-bold text-dark small text-uppercase">Aluno</Form.Label>
-                                <Form.Control placeholder="Nome do aluno..." />
+                                <Form.Control placeholder="Nome do aluno..." value={buscaAluno} onChange={(e) => setBuscaAluno(e.target.value)} />
                             </Form.Group>
                         </Col>
                         <Col md={3}>
@@ -168,7 +202,9 @@ function ValidarCertificados() {
                                         <Row className="align-items-center">
                                             <Col md={7}>
                                                 <h5 className="fw-bold text-dark mb-1">{cert.titulo}</h5>
-                                                <div className="text-primary fw-medium small mb-2">Monitor: {cert.monitor}</div>
+                                                <div className="text-muted fw-bold small mb-1">
+                                                    Aluno: <span className="text-dark">{usuario.name || "Não informado"}</span>
+                                                </div>
                                                 {/*função para on=bservação da negação do certificado*/}
                                                 {cert.status === 'negado' && cert.observacao && (
                                                     <div className="bg-light p-3 rounded mb-3 border-start border-danger border-3 shadow-sm">
@@ -183,7 +219,7 @@ function ValidarCertificados() {
                                             </Col>
 
                                             <Col md={5} className="d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
-                                                <Button variant="outline-primary" className="fw-bold d-flex align-items-center gap-2"><FaCertificate style={{ color: '#FFD43B' }} /> Ver PDF</Button>
+                                                <Button variant="outline-primary" className="fw-bold d-flex align-items-center gap-2" onClick={() => handleVerPDF(cert)}><FaCertificate style={{ color: '#FFD43B' }} /> Ver PDF</Button>
 
                                                 {abaAtiva === 'pendente' ? (
                                                     <>
