@@ -4,9 +4,9 @@ import { TbReportAnalytics } from "react-icons/tb";
 import { FaBell, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import useAuthenticatedUser from "../hooks/useAuthenticatedUser";
 import RecordsTable from "../components/RecordsTable";
-import registroAlunos from "/src/mocks/registro-alunos-mock";
+import registroTutores from "/src/mocks/registro-tutores-mock";
 
-function RegistroAluno() {
+function RegistroTutores() {
     const { usuario, handleLogout } = useAuthenticatedUser();
 
     const gradientStyle = {
@@ -52,7 +52,7 @@ function RegistroAluno() {
             </Navbar>
 
             <Container className="my-5 flex-grow-1">
-                <h1 className="text-primary fw-bold mb-3">Registro de Alunos</h1>
+                <h1 className="text-primary fw-bold mb-3">Registro de Tutores</h1>
 
                 <div className="d-flex justify-content-end mb-3">
                     <Button
@@ -64,7 +64,7 @@ function RegistroAluno() {
                     </Button>
                 </div>
 
-                <RecordsTable user={registroAlunos} route={''} />
+                <RecordsTable user={registroTutores} route={''} />
             </Container>
 
             <footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
@@ -77,4 +77,4 @@ function RegistroAluno() {
     );
 }
 
-export default RegistroAluno;
+export default RegistroTutores;

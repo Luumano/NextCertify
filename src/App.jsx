@@ -14,10 +14,14 @@ import MeusCertificados from './pages/MeusCertificados';
 import AvaliacaoTutoria from './pages/AvaliacaoTutoria';
 import Teste from './pages/teste';
 import EditarPerfil from './pages/EditarPerfil';
+
+// Telas do bolsista
 import HomeBolsista from './pages/HomeBolsista';
 import RegistroAluno from './pages/RegistroAluno';
+import RegistroTutores from './pages/RegistroTutores';
 import AcompanhamentoTutor from './pages/AcompanhamentoTutor';
 import ValidarCertificados from './pages/ValidarCertificados';
+
 
 import HomeTutor from './pages/HomeTutor';
 import AlunosTutor from './pages/AlunosTutor';
@@ -38,11 +42,14 @@ function App() {
       <Route path="/teste" element={<Teste />} />
 
       <Route path="/aluno" element={<HomeAluno />} />
-      <Route path="/bolsista" element={<HomeBolsista />} />
-      <Route path="/registro-aluno" element={<RegistroAluno />} />
+      
       <Route path="/meus-certificados" element={<MeusCertificados />} />
       <Route path="/avaliacao-tutoria" element={<AvaliacaoTutoria />} />
       <Route path="/editar-perfil" element={<EditarPerfil />} />
+
+      <Route path="/bolsista" element={<HomeBolsista />} />
+      <Route path="/registro-aluno" element={<RegistroAluno />} />
+      <Route path="/registro-tutores" element={<RegistroTutores />} />
       <Route path="/acompanhamento-tutor" element={<AcompanhamentoTutor />} />
       <Route path="/validar-certificados" element={<ValidarCertificados />} />
 

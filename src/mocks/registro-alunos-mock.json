@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "nome": "João Silva",
+        "email": "joao@teste.email.com",
+        "matricula": "123456",
+        "certificados": 2
+    },
+    {
+        "id": 2,
+        "nome": "Maria Oliveira",
+        "email": "maria.oliveira@teste.email.com",
+        "matricula": "789012",
+        "certificados": 5
+    },
+    {
+        "id": 3,
+        "nome": "Carlos Santos",
+        "email": "carlos.santos@teste.email.com",
+        "matricula": "345678",
+        "certificados": 1
+    },
+    {
+        "id": 4,
+        "nome": "Ana Pereira",
+        "email": "ana.pereira@teste.email.com",
+        "matricula": "901234",
+        "certificados": 3
+    }
+]

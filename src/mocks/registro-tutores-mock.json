@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nome": "Ricardo Almeida",
+    "email": "ricardo.almeida@teste.email.com",
+    "matricula": "TUT001",
+    "certificados": 8
+  },
+  {
+    "id": 2,
+    "nome": "Fernanda Costa",
+    "email": "fernanda.costa@teste.email.com",
+    "matricula": "TUT002",
+    "certificados": 12
+  },
+  {
+    "id": 3,
+    "nome": "Paulo Nogueira",
+    "email": "paulo.nogueira@teste.email.com",
+    "matricula": "TUT003",
+    "certificados": 5
+  },
+  {
+    "id": 4,
+    "nome": "Juliana Martins",
+    "email": "juliana.martins@teste.email.com",
+    "matricula": "TUT004",
+    "certificados": 9
+  }
+]

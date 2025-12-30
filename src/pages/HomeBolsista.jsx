@@ -4,6 +4,7 @@ import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher,
 import { FaUserGear, FaBell } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
+import { useNavigate } from 'react-router-dom';
 
 function HomeBolsista() {
     const navigate = useNavigate();
@@ -96,7 +97,7 @@ function HomeBolsista() {
                                 <Button
                                     variant="primary"
                                     className="px-4 py-2 w-100"
-                                    onClick={() => navigate('')}
+                                    onClick={() => navigate('/registro-aluno')}
                                 >
                                     Veja mais
                                 </Button>
@@ -117,7 +118,7 @@ function HomeBolsista() {
                                 <Button
                                     variant="primary"
                                     className="px-4 py-2 w-100"
-                                    onClick={() => navigate('')}
+                                    onClick={() => navigate('/registro-tutores')}
                                 >
                                     Veja mais
                                 </Button>
