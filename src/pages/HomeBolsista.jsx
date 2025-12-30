@@ -4,7 +4,6 @@ import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher,
 import { FaUserGear, FaBell } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
-import { useNavigate } from 'react-router-dom';
 
 function HomeBolsista() {
     const navigate = useNavigate();
