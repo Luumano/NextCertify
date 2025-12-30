@@ -14,11 +14,12 @@ import useAlert from '../hooks/useAlert';
 function Cadastro() {
     const navigate = useNavigate();
 
-    const { show, message, variant, key, handleAlert } = useAlert();
+    const { show, message, variant, alertKey, handleAlert } = useAlert();
 
     const [dados, setDados] = useState({
         nome: '',
         matricula: '',
+        curso: '',
         email: '',
         senha: '',
         confirmarSenha: ''
@@ -37,7 +38,7 @@ function Cadastro() {
         }
 
         try {
-            await register(dados.nome, dados.matricula, dados.email, dados.senha);
+            await register(dados.nome, dados.matricula, dados.curso, dados.email, dados.senha);
             alert("Cadastro realizado com sucesso! Faça o login.");
             navigate('/');
         } catch (err) {
@@ -90,6 +91,30 @@ function Cadastro() {
                                     />
                                 </div>
 
+                                <Form.Select
+                                    required
+                                    id='curso'
+                                    className='mb-3 label-float'
+                                    value={dados.curso}
+                                    onChange={handleChange}
+                                    style={
+                                        {
+                                            border: '1px solid #8C8B8B',
+                                            borderRadius: '20px'
+                                        }
+                                    }>
+                                    <option value="">Selecione o curso</option>
+                                    <option value="Ciência da Computação">Ciência da Computação</option>
+                                    <option value="Engenharia Ambiental">Engenharia Ambiental</option>
+                                    <option value="Engenharia Ambiental e Sanitária">
+                                        Engenharia Ambiental e Sanitária
+                                    </option>
+                                    <option value="Engenharia Civil">Engenharia Civil</option>
+                                    <option value="Engenharia de Minas">Engenharia de Minas</option>
+                                    <option value="Sistemas de Informação">Sistemas de Informação</option>
+                                    <option value="nenhum">Nenhum</option>
+                                </Form.Select>
+
                                 <div className="mb-3">
                                     <InputFlutuante
                                         type="email" id="email" label="Email"
@@ -115,7 +140,7 @@ function Cadastro() {
                                     show={show}
                                     message={message}
                                     variant={variant}
-                                    key={key}
+                                    key={alertKey}
                                 />
 
                                 <div className="py-2">

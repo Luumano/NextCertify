@@ -54,10 +54,6 @@
     resize: none;
 }
 
-button.form-button {
-    border-radius: 2rem;
-}
-
 @media (max-width: 768px) {
     button.btn-form {
         max-width: 100%;

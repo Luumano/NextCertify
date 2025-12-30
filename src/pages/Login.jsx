@@ -14,7 +14,7 @@ function Login() {
 
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
-    const { show, message, variant, key, handleAlert } = useAlert();
+    const { show, message, variant, alertKey, handleAlert } = useAlert();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,7 +22,6 @@ function Login() {
         try {
             const user = await login(email, senha);
 
-            console.log("Login efetuado:", { email, senha });
             alert(`Bem-vindo de volta ${user.name}`);
 
             navigate('/aluno');
@@ -94,7 +93,7 @@ function Login() {
                                     show={show}
                                     message={message}
                                     variant={variant}
-                                    key={key}
+                                    key={alertKey}
                                 />
 
                                 <div className="py-2">

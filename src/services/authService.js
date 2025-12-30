@@ -22,7 +22,7 @@ async function login(email, password) {
 }
 
 
-async function register(name, matricula, email, password){
+async function register(name, matricula, curso, email, password){
     const url = "/src/mocks/auth-mock.json";
 
     const data = await getData(url);
@@ -39,7 +39,11 @@ async function register(name, matricula, email, password){
     }
 
     const id = (allUsers.reduce((max, u) => Math.max(max, u.id || 0),0)) + 1;
-    const newUser = { id, name, matricula, email, password, role: "aluno" };
+    const newUser = { id, name, matricula, curso, email, password, role: "aluno" };
+    
+    if (newUser.curso === "nenhum") {
+        newUser.role = "coordenador"
+    }
 
     // Salvando Localmente para realizar testes de cadastro  --- Germano
     // Não apagar por enquanto por favor, quem for mexer
