@@ -21,7 +21,10 @@ import RegistroAluno from './pages/RegistroAluno';
 import RegistroTutores from './pages/RegistroTutores';
 import AcompanhamentoTutor from './pages/AcompanhamentoTutor';
 import ValidarCertificados from './pages/ValidarCertificados';
-
+import RelatorioIndividualTutor from './pages/RelatorioIndividualTutor';
+import RelatorioGeralTutor from './pages/RelatorioGeralTutor';
+import RelatorioIndividualAluno from './pages/RelatorioIndividualAluno';
+import RelatorioGeralAluno from './pages/RelatorioGeralAluno';
 
 import HomeTutor from './pages/HomeTutor';
 import AlunosTutor from './pages/AlunosTutor';
@@ -50,6 +53,10 @@ function App() {
       <Route path="/bolsista" element={<HomeBolsista />} />
       <Route path="/registro-aluno" element={<RegistroAluno />} />
       <Route path="/registro-tutores" element={<RegistroTutores />} />
+      <Route path="/relatorio-individual-tutor" element={<RelatorioIndividualTutor />} />
+      <Route path="/relatorio-geral-tutor" element={<RelatorioGeralTutor />} />
+      <Route path="/relatorio-individual-aluno" element={<RelatorioIndividualAluno />} />
+      <Route path="/relatorio-geral-aluno" element={<RelatorioGeralAluno />} />
       <Route path="/acompanhamento-tutor" element={<AcompanhamentoTutor />} />
       <Route path="/validar-certificados" element={<ValidarCertificados />} />
 

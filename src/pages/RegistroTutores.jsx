@@ -5,8 +5,10 @@ import { FaBell, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import useAuthenticatedUser from "../hooks/useAuthenticatedUser";
 import RecordsTable from "../components/RecordsTable";
 import registroTutores from "/src/mocks/registro-tutores-mock";
+import { useNavigate } from "react-router-dom";
 
 function RegistroTutores() {
+    const navigate = useNavigate();
     const { usuario, handleLogout } = useAuthenticatedUser();
 
     const gradientStyle = {
@@ -58,13 +60,14 @@ function RegistroTutores() {
                     <Button
                         variant="primary"
                         className="px-4 py-2 d-flex justify-content-center align-items-center gap-1"
+                        onClick={() => navigate('/relatorio-geral-tutor')}
                     >
                         <TbReportAnalytics size={25} className="text-light" />
                         <span>Relatório geral</span>
                     </Button>
                 </div>
 
-                <RecordsTable user={registroTutores} route={''} />
+                <RecordsTable user={registroTutores} route={'/relatorio-individual-tutor'} />
             </Container>
 
             <footer style={{ ...gradientStyle, padding: '30px 0', textAlign: 'center' }} className="mt-auto">
