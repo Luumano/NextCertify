@@ -1,50 +1,52 @@
-import { Container, Row, Col, Card, Button, Navbar, Nav, Image } from 'react-bootstrap';
-import { FaBell, FaUserCircle, FaSignOutAlt, FaCheckCircle, FaClock } from 'react-icons/fa';
+import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Modal, ListGroup } from 'react-bootstrap';
+import { FaBell, FaUserCircle, FaSignOutAlt, FaCheckCircle, FaClock, FaFileAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import mockRelatorios from '../mocks/relatoriosmock.json';
 import LogoNextCertify from '../img/NextCertify.png';
+
 
 function RelatoriosTutor() {
     const navigate = useNavigate();
-
+    const [relatorios, setRelatorios] = useState([]);
+    const [abaAtiva, setAbaAtiva] = useState('concluido');
+    const [showModal, setShowModal] = useState(false);
+    const [relatorioSelecionado, setRelatorioSelecionado] = useState(null);
     // carrega user sem crashar
     const [usuario] = useState(() => {
         const saved = localStorage.getItem("usuarioLogado");
         return saved ? JSON.parse(saved) : null;
     });
 
-    // controla as abas (tabs)
-    const [abaAtiva, setAbaAtiva] = useState('concluidos');
-
     useEffect(() => {
-        if (!usuario) navigate('/');
+        if (!usuario) {
+            navigate('/');
+        } else {
+            const dadosEstaticos = mockRelatorios;
+            const dadosNovos = JSON.parse(localStorage.getItem("relatorios_cadastrados") || "[]");
+            setRelatorios([...dadosNovos, ...dadosEstaticos]);
+        }
     }, [usuario, navigate]);
+
+    const handleVerDetalhes = (relatorio) => {
+        setRelatorioSelecionado(relatorio);
+        setShowModal(true);
+    };
 
     const handleLogout = () => {
         localStorage.removeItem("usuarioLogado");
         navigate('/');
     };
 
-    // dados fake dos relatorios
-    const todosRelatorios = [
-        { id: 1, aluno: "João Silva", data: "10/05/25", status: "concluido" },
-        { id: 2, aluno: "Maria Oliveira", data: "12/05/25", status: "concluido" },
-        { id: 3, aluno: "Pedro Santos", data: "15/05/25", status: "concluido" },
-        { id: 4, aluno: "Ana Clara", data: "10/05/25", status: "concluido" },
-        { id: 5, aluno: "Lucas Lima", data: "10/06/25", status: "pendente" },
-        { id: 6, aluno: "Carla Diaz", data: "11/06/25", status: "pendente" },
-        { id: 7, aluno: "Marcos Paulo", data: "12/06/25", status: "pendente" },
-        { id: 8, aluno: "Julia Roberts", data: "13/06/25", status: "pendente" },
-        { id: 9, aluno: "Roberto Carlos", data: "14/06/25", status: "pendente" },
-        { id: 10, aluno: "Fernanda Torres", data: "15/06/25", status: "pendente" },
-    ];
+    // filtra a lista pela aba selecionada (FOI CORRIGIDO O FILTRO PARA PEGAR STATUS DO MOCK)
+    const relatoriosFiltrados = relatorios.filter(r => {
+        const statusAlvo = abaAtiva === 'concluido' ? 'concluido' : 'pendente';
+        return r.status === statusAlvo;
+    });
 
-    // filtra a lista pela aba selecionada
-    const relatoriosFiltrados = todosRelatorios.filter(r => r.status === abaAtiva);
-
-    // contadores pros botões
-    const countConcluidos = todosRelatorios.filter(r => r.status === 'concluido').length;
-    const countPendentes = todosRelatorios.filter(r => r.status === 'pendente').length;
+    // contadores pros botões (ALTERAÇÃO DE todosRelatorios para Relatorios)
+    const countConcluidos = relatorios.filter(r => r.status === 'concluido').length;
+    const countPendentes = relatorios.filter(r => r.status === 'pendente').length;
 
     if (!usuario) return <div className="p-5 text-center">Carregando...</div>;
 
@@ -81,20 +83,20 @@ function RelatoriosTutor() {
 
             {/* --- CONTEÚDO PRINCIPAL --- */}
             <Container className="my-5 flex-grow-1">
-
                 <h2 className="fw-bold mb-4" style={{ color: '#0f52ba' }}>Relatórios do Tutor</h2>
 
-                {/* --- BOTÕES DE ABAS --- */}
+                {/* --- BOTÕES DE ABAS (CORRIGINDO CONFIGURAÇÃO DOS BOTÕES)--- */}
                 <div className="d-flex gap-3 mb-5">
                     <Button
                         className="px-5 py-2 fw-bold"
                         style={{
-                            backgroundColor: abaAtiva === 'concluidos' ? '#1565c0' : '#888',
-                            borderColor: abaAtiva === 'concluidos' ? '#1565c0' : '#888',
+                            backgroundColor: abaAtiva === 'concluido' ? '#1565c0' : '#dee2e6',
+                            borderColor: abaAtiva === 'concluido' ? '#1565c0' : '#dee2e6',
+                            color: abaAtiva === 'pendente' ? '#000' : '#fff',
                             flex: 1,
                             maxWidth: '300px'
                         }}
-                        onClick={() => setAbaAtiva('concluidos')}
+                        onClick={() => setAbaAtiva('concluido')}
                     >
                         Concluídos ({countConcluidos})
                     </Button>
@@ -102,12 +104,13 @@ function RelatoriosTutor() {
                     <Button
                         className="px-5 py-2 fw-bold"
                         style={{
-                            backgroundColor: abaAtiva === 'pendentes' ? '#1565c0' : '#888',
-                            borderColor: abaAtiva === 'pendentes' ? '#1565c0' : '#888',
+                            backgroundColor: abaAtiva === 'pendente' ? '#1565c0' : '#dee2e6',
+                            borderColor: abaAtiva === 'pendente' ? '#1565c0' : '#dee2e6',
+                            color: abaAtiva === 'concluido' ? '#000' : '#fff',
                             flex: 1,
                             maxWidth: '300px'
                         }}
-                        onClick={() => setAbaAtiva('pendentes')}
+                        onClick={() => setAbaAtiva('pendente')}
                     >
                         Pendentes ({countPendentes})
                     </Button>
@@ -119,9 +122,8 @@ function RelatoriosTutor() {
                 <Row className="g-4">
                     {relatoriosFiltrados.map((item) => (
                         <Col md={6} key={item.id}>
-                            <Card className="border-0 shadow-sm rounded-3 p-2">
+                            <Card className="border-0 shadow-sm rounded-3 p-2 h-100">
                                 <Card.Body className="d-flex align-items-center justify-content-between">
-
                                     <div className="d-flex align-items-center gap-3">
                                         {/* muda ícone conforme status */}
                                         {item.status === 'concluido' ? (
@@ -129,7 +131,6 @@ function RelatoriosTutor() {
                                         ) : (
                                             <FaClock size={40} className="text-warning" />
                                         )}
-
                                         <div className="d-flex flex-column">
                                             <span className="fw-bold fs-5 text-dark">{item.aluno}</span>
                                             <span className="text-muted small">Data: {item.data}</span>
@@ -143,9 +144,9 @@ function RelatoriosTutor() {
                                         className="fw-bold px-3"
                                         onClick={() => {
                                             if (item.status === 'pendente') {
-                                                navigate('/forms-tutor');
+                                                navigate('/forms-tutor', { state: { alunoNome: item.aluno } });
                                             } else {
-                                                alert("Detalhes do relatório concluído...");
+                                                handleVerDetalhes(item);
                                             }
                                         }}
                                     >
@@ -156,13 +157,70 @@ function RelatoriosTutor() {
                             </Card>
                         </Col>
                     ))}
-
-                    {relatoriosFiltrados.length === 0 && (
-                        <p className="text-muted text-center mt-5">Nenhum relatório encontrado nesta categoria.</p>
-                    )}
                 </Row>
-
             </Container>
+
+            {/*MODAL PARA VER OS RELATÓRIOS QUE JÁ FORAM PREENCHIDOS*/}
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
+                <Modal.Header closeButton className="border-0">
+                    <Modal.Title className="fw-bold text-primary">
+                        <FaFileAlt className="me-2" /> Detalhes do Acompamhamento
+                    </Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body className="bg-light rounded-bottom p-4">
+                    {relatorioSelecionado && (
+                        <div>
+                            <h5 className="fw-bold text-dark mb-4">{relatorioSelecionado.aluno}</h5>
+                            <Row className="g-3">
+                                <Col md={6}>
+                                    <p className="mb-1 text-muted small fw-bold">STATUS</p>
+                                    <span className="badge bg-success px-3 py-2">Concluído</span>
+                                </Col>
+                                <Col md={6}>
+                                    <p className="mb-1 text-muted small fw-bold">DATA DE ENTREGA</p>
+                                    <p className="fw-medium">{relatorioSelecionado.data}</p>
+                                </Col>
+                                
+                                {/* Exibe os detalhes que vieram do formulário (localStorage) */}
+                                {relatorioSelecionado.detalhes ? (
+                                    <>
+                                        <Col md={6}>
+                                            <p className="mb-1 text-muted small fw-bold">ENCONTROS VIRTUAIS</p>
+                                            <p className="fw-medium">{relatorioSelecionado.detalhes.virtuais} encontro(s)</p>
+                                        </Col>
+                                        <Col md={6}>
+                                            <p className="mb-1 text-muted small fw-bold">ENCONTROS PRESENCIAIS</p>
+                                            <p className="fw-medium">{relatorioSelecionado.detalhes.presenciais} encontro(s)</p>
+                                        </Col>
+                                        <Col md={12}>
+                                            <p className="mb-1 text-muted small fw-bold">TIPO DE DIFICULDADE</p>
+                                            <p className="fw-medium text-capitalize">{relatorioSelecionado.detalhes.dificuldadeTipo}</p>
+                                        </Col>
+                                        <Col md={12}>
+                                            <Card className="border-0 shadow-sm p-3 mt-2">
+                                                <p className="mb-2 text-muted small fw-bold">DESCRIÇÃO/OBSERVAÇÕES</p>
+                                                <p className="mb-0" style={{ whiteSpace: 'pre-wrap' }}>
+                                                    {relatorioSelecionado.detalhes.descricao || "Nenhuma observação registrada."}
+                                                </p>
+                                            </Card>
+                                        </Col>
+                                    </>
+                                ) : (
+                                    <Col md={12}>
+                                        <p className="text-muted italic">Este é um registro histórico do sistema (Mock).</p>
+                                    </Col>
+                                )}
+                            </Row>
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className="border-0">
+                    <Button variant="secondary" onClick={() => setShowModal(false)} className="fw-bold">
+                        Fechar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {/* --- FOOTER --- */}
             <footer style={{ background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)', padding: '30px 0', textAlign: 'center', color: 'white' }} className="mt-auto">

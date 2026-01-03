@@ -1,11 +1,14 @@
 import { Container, Row, Col, Button, Navbar, Nav, Form, Image } from 'react-bootstrap';
-import { FaBell, FaUserCircle, FaSignOutAlt, FaSave } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaBell, FaUserCircle, FaSignOutAlt, FaSave, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import LogoNextCertify from '../img/NextCertify.png';
 
 function FormsTutor() {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const nomeAlunoSelecionado = location.state?.alunoNome || "João Silva de Lima Barreto";
 
     // carrega user do storage sem quebrar o useEffect
     const [usuario] = useState(() => {
@@ -17,6 +20,14 @@ function FormsTutor() {
     const [dataAtual] = useState(() => {
         const hoje = new Date();
         return hoje.toLocaleDateString('pt-BR');
+    });
+
+    const [formData, setFormData] = useState({
+        aluno: nomeAlunoSelecionado,
+        virtuais: 0,
+        presenciais: 0,
+        dificuldadeTipo: 'selecionar',
+        descricao: ''
     });
 
     useEffect(() => {
@@ -31,9 +42,20 @@ function FormsTutor() {
     };
 
     const handleSalvar = (e) => {
-        e.preventDefault();
-        alert("Formulário salvo com sucesso!");
-        navigate('/home-tutor');
+        const novoRelatorio = {
+            id: Date.now(),
+            aluno: formData.aluno,
+            data: dataAtual,
+            status: "concluido",
+            detalhes: formData
+        };
+
+        const relatoriosSalvos = JSON.parse(localStorage.getItem("relatorios_cadastrados") || "[]");
+        relatoriosSalvos.push(novoRelatorio);
+        localStorage.setItem("relatorios_cadastrados", JSON.stringify(relatoriosSalvos));
+        alert(`Relatório de ${formData.aluno} enviado com sucesso!`);
+        navigate('/relatorios-tutor');
+
     };
 
     if (!usuario) return <div className="p-5 text-center">Carregando...</div>;
@@ -69,6 +91,10 @@ function FormsTutor() {
             </Navbar>
 
             <Container className="my-5 flex-grow-1">
+                <Button variant="link" className="text-decoration-none mb-3 p-0 d-flex align-items-center gap-2 text-secondary" onClick={() => navigate(-1)}>
+                    <FaArrowLeft /> Voltar
+                </Button>
+
                 <div className="bg-white p-5 rounded-4 shadow-sm">
                     <h2 className="fw-bold mb-3" style={{ color: '#0f52ba' }}>Formulário de Acompanhamento</h2>
                     <p className="mb-1 text-dark">Prezado tutor,</p>
@@ -96,14 +122,14 @@ function FormsTutor() {
                         <Row className="mb-3">
                             <Col md={6}>
                                 <Form.Group controlId="formAluno">
-                                    <Form.Label className="text-primary fw-medium">Aluno</Form.Label>
-                                    <Form.Control type="text" placeholder="Nome do Aluno" defaultValue="João Silva de Lima Barreto" />
+                                    <Form.Label className="text-primary fw-medium">Tutorando</Form.Label>
+                                    <Form.Control type="text" value={formData.aluno} onChange={(e) => setFormData({...formData, aluno: e.target.value})} placeholder="Nome do aluno"/>
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
                                 <Form.Group controlId="formEncontrosVirtuais">
                                     <Form.Label className="text-primary fw-medium">Quantidade de encontros virtuais</Form.Label>
-                                    <Form.Control type="number" placeholder="" />
+                                    <Form.Control type="number" value={formData.virtuais} onChange={(e) => setFormData({...formData, virtuais: e.target.value})} />
                                 </Form.Group>
                             </Col>
                         </Row>
@@ -112,26 +138,26 @@ function FormsTutor() {
                             <Col md={6}>
                                 <Form.Group controlId="formEncontrosPresenciais">
                                     <Form.Label className="text-primary fw-medium">Quantidade de encontros presenciais</Form.Label>
-                                    <Form.Control type="number" placeholder="" />
+                                    <Form.Control type="number" value={formData.presenciais} onChange={(e) => setFormData({...formData, presenciais: e.target.value})} />
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
                                 <Form.Group controlId="formDificuldades">
                                     <Form.Label className="text-primary fw-medium">Dificuldades dos alunos</Form.Label>
-                                    <Form.Select>
+                                    <Form.Select value={formData.dificuldadeTipo} onChange={(e) => setFormData({...formData, dificuldadeTipo: e.target.value})}>
                                         <option>Selecionar</option>
                                         <option value="nenhuma">Nenhuma dificuldade</option>
                                         <option value="conteudo">Dificuldade com conteúdo</option>
                                         <option value="acesso">Problemas de acesso/internet</option>
-                                        <option value="outras">Outras</option>
+                                        <option value="outras">Outras(Especificar abaixo)</option>
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
                         </Row>
 
                         <Form.Group className="mb-4" controlId="formDescricao">
-                            <Form.Label className="text-primary fw-medium">Descrição da dificuldade</Form.Label>
-                            <Form.Control as="textarea" rows={6} style={{ resize: 'none' }} />
+                            <Form.Label className="text-primary fw-medium">Descrição Detalhada</Form.Label>
+                            <Form.Control as="textarea" rows={6} style={{ resize: 'none' }} value={formData.descricao} onChange={(e) => setFormData({...formData, descricao: e.target.value})} placeholder="Descreva aqui qualquer outra dificuldade do aluno" />
                         </Form.Group>
 
                         <div className="d-flex justify-content-end">
