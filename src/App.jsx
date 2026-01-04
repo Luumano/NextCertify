@@ -25,6 +25,7 @@ import RelatorioIndividualTutor from './pages/RelatorioIndividualTutor';
 import RelatorioGeralTutor from './pages/RelatorioGeralTutor';
 import RelatorioIndividualAluno from './pages/RelatorioIndividualAluno';
 import RelatorioGeralAluno from './pages/RelatorioGeralAluno';
+import Predefinicoes from './pages/Predefinicoes';
 
 import HomeTutor from './pages/HomeTutor';
 import AlunosTutor from './pages/AlunosTutor';
@@ -59,6 +60,7 @@ function App() {
       <Route path="/relatorio-geral-aluno" element={<RelatorioGeralAluno />} />
       <Route path="/acompanhamento-tutor" element={<AcompanhamentoTutor />} />
       <Route path="/validar-certificados" element={<ValidarCertificados />} />
+      <Route path="/predefinicoes" element={<Predefinicoes />} />
 
       <Route path="/home-tutor" element={<HomeTutor />} />
       <Route path="/alunos-tutor" element={<AlunosTutor />} />
