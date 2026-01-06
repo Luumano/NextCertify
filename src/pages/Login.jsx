@@ -21,10 +21,23 @@ function Login() {
 
         try {
             const user = await login(email, senha);
-
             alert(`Bem-vindo de volta ${user.name}`);
 
-            navigate('/aluno');
+            //Lógica para redirecionamento dos usuários baseados nos ROLEs
+            switch(user.role){
+                case 'coordenador':
+                    navigate('/coordenador');
+                    break;
+                case 'bolsista':
+                    navigate('/bolsista');
+                    break;
+                case 'tutor':
+                    navigate('/home-tutor');
+                    break;
+                case 'aluno':
+                    navigate('/aluno');
+                    break;
+            }
         } catch (error) {
             handleAlert(error.message);
         }

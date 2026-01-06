@@ -186,6 +186,7 @@ function RelatoriosCoordenador() {
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
                             <div className="d-flex align-items-center gap-2">
                                 <FaUserCircle size={32} className="text-primary" />
+
                                 <span className="fw-bold text-dark">{dadosDashboard.usuario.name}</span>
                             </div>
                             <Button variant="outline-danger" size="sm" onClick={handleLogout} className="d-flex align-items-center gap-2">

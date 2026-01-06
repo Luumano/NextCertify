@@ -1,0 +1,26 @@
+[
+{ 
+        "id": 1, 
+        "nome": "João Silva", 
+        "email": "joao@teste.email.com", 
+        "ultimaData": "21/10/2025",
+        "matricula": "123456", 
+        "tutorMatricula": "78934" 
+    },
+    { 
+        "id": 2, 
+        "nome": "Maria Oliveira", 
+        "email": "maria.oliveira@teste.email.com", 
+        "ultimaData": "21/10/2025",
+        "matricula": "789012",
+        "tutorMatricula": "78934" 
+    },
+    { 
+        "id": 4, 
+        "nome": "Ana Pereira", 
+        "email": "ana.pereira@teste.email.com", 
+        "matricula": "901234", 
+        "ultimaData": "21/10/2025",
+        "tutorMatricula": "78934" 
+    }
+]

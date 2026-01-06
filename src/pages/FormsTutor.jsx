@@ -23,7 +23,7 @@ function FormsTutor() {
     });
 
     const [formData, setFormData] = useState({
-        aluno: nomeAlunoSelecionado,
+        aluno: location.state?.aluno?.aluno || nomeAlunoSelecionado,
         virtuais: 0,
         presenciais: 0,
         dificuldadeTipo: 'selecionar',
@@ -33,6 +33,12 @@ function FormsTutor() {
     useEffect(() => {
         if (!usuario) {
             navigate('/');
+        } else if(usuario.role !== 'tutor'){
+            alert("Acesso negado. Está página é exclusiva para tutores.");
+            if(usuario.role === 'coordenador') navigate('/coordenador');
+            else if(userParsed.role === 'bolsista') navigate('/bolsista');
+            else if(userParsed.role === 'aluno') navigate('/aluno');
+            else navigate('/');
         }
     }, [usuario, navigate]);
 
@@ -42,9 +48,12 @@ function FormsTutor() {
     };
 
     const handleSalvar = (e) => {
+        e.preventDefault();
         const novoRelatorio = {
             id: Date.now(),
             aluno: formData.aluno,
+            tutorMatricula: usuario?.matricula,
+            matricula: location.state?.aluno?.matricula || "000000",
             data: dataAtual,
             status: "concluido",
             detalhes: formData
@@ -58,7 +67,9 @@ function FormsTutor() {
 
     };
 
-    if (!usuario) return <div className="p-5 text-center">Carregando...</div>;
+    if (!usuario || usuario.role !== 'tutor') {
+        return <div className="p-5 text-center">Verificando permissões...</div>;
+    }
 
     return (
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
