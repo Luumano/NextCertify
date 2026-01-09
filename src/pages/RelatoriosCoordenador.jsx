@@ -27,11 +27,58 @@ function RelatoriosCoordenador() {
     });
 
     useEffect(() => {
-            setDadosDashboard({
-                ...mockData,
-                usuario: { name: "Coordenador Geral" }
+        const baseDados = { ...mockData };
+        const relatoriosTutores = JSON.parse(localStorage.getItem("relatorios_cadastrados") || "[]");
+        const avaliacoesReais = JSON.parse(localStorage.getItem("@App:avaliacoes") || "[]");
+        
+        if(relatoriosTutores.length > 0){
+            if(baseDados.metricas[1]){
+                baseDados.metricas[1].val = relatoriosTutores.length;
+            }
+
+            baseDados.atividadesRecentes = relatoriosTutores.map(rel => ({
+                id: rel.id,
+                tutor: rel.tutorNome || "Tutor",
+                aluno: rel.aluno,
+                data: rel.data,
+                status: "Concluído"
+            })).reverse();
+
+            const counts = { conteudo: 0, acesso: 0, nenhuma: 0, outras: 0};
+            relatoriosTutores.forEach(rel => {
+                if(counts[rel.dificuldadeTipo] !== undefined){
+                    counts[rel.dificuldadeTipo]++;
+                }
             });
-        }, []);
+
+            baseDados.graficoDificuldades = [
+                { name: 'Conteúdo', total: counts.conteudo },
+                { name: 'Acesso', total: counts.acesso },
+                { name: 'Nenhuma', total: counts.nenhuma },
+                { name: 'Outras', total: counts.outras },
+            ];
+        }
+
+        if(avaliacoesReais.length > 0){
+            if(baseDados.metricas[0]) {
+                baseDados.metricas[0].val = avaliacoesReais.length;
+            }
+
+            baseDados.tutorandos = avaliacoesReais.map(av => ({
+                id: av.email ? av.email.split('@')[0] : Math.random().toString(36).substr(2, 5),
+                nome: av.nome,
+                encontros: 1,
+                semestre: "2025.1"
+            }));
+
+            const somaExp = avaliacoesReais.reduce((acc, curr) => acc + Number(curr.experiencia), 0);
+            const mediaExp = (somaExp / avaliacoesReais.length).toFixed(0); 
+        }
+        setDadosDashboard({
+            ...baseDados,
+            usuario: { name: "Coordenador Geral" }
+        });
+    }, []);
 
     const downloadCSV = () => {
         let csv = "";
