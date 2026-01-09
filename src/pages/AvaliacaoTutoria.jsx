@@ -2,19 +2,23 @@ import { useState } from 'react';
 import { Container, Row, Col, Button, Navbar, Nav, Form, Image } from 'react-bootstrap';
 import { FaBell, FaUserCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import LogoNextCertify from '../img/NextCertify.png';
 
 function AvaliacaoTutoria() {
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState(() => {
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
-        const today = new Date().toISOString().slice(0, 10);
+    const [usuario, setUsuario] = useState(() => {
+        const saved = localStorage.getItem("usuarioLogado");
+        return saved ? JSON.parse(saved) : null;
+    });
 
+    const [formData, setFormData] = useState(() => {
+        const today = new Date().toISOString().slice(0, 10);
         return {
-            nome: usuarioLogado.name || '',
+            nome: usuario?.name || '', 
             data: today,
-            email: usuarioLogado.email || '',
+            email: usuario?.email || '',
             curso: '',
             permanecer: 'sim',
             experiencia: 50,
@@ -23,6 +27,27 @@ function AvaliacaoTutoria() {
             descricao: ''
         };
     });
+
+    useEffect(() => {
+        if (!usuario) {
+            navigate('/');
+        } else if (usuario.role !== 'aluno') {
+            alert("Acesso negado. Esta página é exclusiva para alunos.");
+            
+            const rotas = {
+                tutor: '/home-tutor',
+                bolsista: '/bolsista',
+                coordenador: '/coordenador'
+            };
+            navigate(rotas[usuario.role] || '/');
+        }
+    }, [usuario, navigate]);
+
+    const handleLogout = () => {
+        localStorage.removeItem("usuarioLogado");
+        navigate('/');
+    };
+
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });

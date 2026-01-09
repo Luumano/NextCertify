@@ -2,6 +2,7 @@ import { Container, Row, Col, Card, Button, Navbar, Nav, Badge, Image } from 're
 import LogoNextCertify from '../img/NextCertify.png';
 import { FaUserGraduate, FaUserCircle, FaSignOutAlt, FaPen, FaChalkboardTeacher, FaFile, FaCertificate } from 'react-icons/fa';
 import { FaUserGear, FaBell } from 'react-icons/fa6';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 
@@ -14,8 +15,24 @@ function HomeBolsista() {
         color: 'white'
     };
 
-    if (!usuario) {
-        return <div className="p-5 text-center">Carregando...</div>;
+    useEffect(() => {
+            const savedUser = localStorage.getItem("usuarioLogado");
+            const userParsed = savedUser ? JSON.parse(savedUser) : null;
+    
+            if(!userParsed){
+                navigate('/');
+            } else if(userParsed.role !== 'bolsista'){
+                alert("Acesso restrito: Você não tem permissão de bolsista.");
+    
+                if(userParsed.role === 'tutor') navigate('/home-tutor');
+                else if(userParsed.role === 'coordenador') navigate('/coordenador');
+                else if(userParsed.role === 'aluno') navigate('/aluno');
+                else navigate('/');
+            }
+        }, [navigate]);
+
+    if (!usuario || usuario.role !== 'bolsista') {
+        return <div className="p-5 text-center">Verificando permissões...</div>;
     }
 
     return (

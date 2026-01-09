@@ -1,7 +1,6 @@
 import { Container, Row, Col, Card, Button, Navbar, Nav, Badge, Image } from 'react-bootstrap';
 import { FaBell, FaUserCircle, FaCertificate, FaClipboardCheck, FaPen, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-
 import LogoNextCertify from '../img/NextCertify.png';
 import { useState, useEffect } from 'react';
 
@@ -10,17 +9,20 @@ function HomeAluno() {
     const [usuario, setUsuario] = useState(null);
 
     useEffect(() => {
-        //Não apagar por enquanto para realizar os testes
-        // Pegar os dados salvos no LocalStorage
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+        const savedUser = localStorage.getItem("usuarioLogado");
+        const userParsed = savedUser ? JSON.parse(savedUser) : null;
 
-        if (usuarioLogado) {
-            setUsuario(usuarioLogado);
-        } else {
-            // Vai retornar para login caso não tenha usuário logado
-            navigate('/');
-        }
-    }, [navigate]);
+        if (!userParsed) {
+            navigate('/');
+        } else if (userParsed.role !== 'aluno') {
+            alert("Acesso restrito: Você não tem permissão de aluno.");
+            const rotas = { tutor: '/home-tutor', bolsista: '/bolsista', coordenador: '/coordenador' };
+            navigate(rotas[userParsed.role] || '/');
+        } else {
+            setUsuario(userParsed); 
+        }
+    }, [navigate]);
+
 
     const handleLogout = () => {
         localStorage.removeItem("usuarioLogado");
@@ -32,8 +34,8 @@ function HomeAluno() {
         color: 'white'
     };
 
-    if (!usuario) {
-        return <div>Carregando...</div>;
+    if (!usuario || usuario.role !== 'aluno') {
+        return <div className="p-5 text-center">Verificando permissões...</div>;
     }
 
     return (

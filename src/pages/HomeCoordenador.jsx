@@ -15,8 +15,24 @@ function HomeCoordenador() {
         color: 'white'
     };
 
-    if (!usuario) {
-        return <div className="p-5 text-center">Carregando...</div>;
+    useEffect(() => {
+        const savedUser = localStorage.getItem("usuarioLogado");
+        const userParsed = savedUser ? JSON.parse(savedUser) : null;
+
+        if(!userParsed){
+            navigate('/');
+        } else if(userParsed.role !== 'coordenador'){
+            alert("Acesso restrito: Você não tem permissão de coordenador.");
+
+            if(userParsed.role === 'tutor') navigate('/home-tutor');
+            else if(userParsed.role === 'bolsista') navigate('/bolsista');
+            else if(userParsed.role === 'aluno') navigate('/aluno');
+            else navigate('/');
+        }
+    }, [navigate]);
+
+    if (!usuario || usuario.role !== 'coordenador') {
+        return <div className="p-5 text-center">Verificando permissões...</div>;
     }
 
     return (
@@ -46,7 +62,7 @@ function HomeCoordenador() {
                                 <FaUserCircle size={32} className="text-primary" />
                                 <span className="fw-bold text-dark">{usuario.name}</span>
                             </div>
-                            <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
+                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
                         </div>
                     </Navbar.Collapse>
                 </Container>

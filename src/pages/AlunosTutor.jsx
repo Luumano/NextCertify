@@ -1,21 +1,43 @@
 import { Container, Row, Col, Button, Navbar, Nav, Badge, Image, Table } from 'react-bootstrap';
-import { FaBell, FaUserCircle, FaSignOutAlt, FaPen, FaFileAlt } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaBell, FaUserCircle, FaSignOutAlt, FaPen, FaFileAlt, FaEye } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom'; // Adicionado useLocation
 import { useState, useEffect } from 'react';
 import LogoNextCertify from '../img/NextCertify.png';
+import alunoTutor from '../mocks/aluno-tutor-mock.json';
 
 function AlunosTutor() {
     const navigate = useNavigate();
+    const location = useLocation(); 
+    
+    const relatoriosSalvos = JSON.parse(localStorage.getItem("relatorios_cadastrados") || "[]");
 
-    // carrega user do storage
     const [usuario] = useState(() => {
         const saved = localStorage.getItem("usuarioLogado");
         return saved ? JSON.parse(saved) : null;
     });
 
+    const listaAlunos = alunoTutor
+        .filter(aluno => aluno.tutorMatricula === usuario?.matricula)
+        .map(aluno => {
+            const relatoriosDoAluno = relatoriosSalvos.filter(r => 
+                r.aluno.trim().toLowerCase() === aluno.nome.trim().toLowerCase()
+            );
+            const ultimaDataReal = relatoriosDoAluno.length > 0 
+                ? relatoriosDoAluno[relatoriosDoAluno.length - 1].data 
+                : (aluno.ultimaData || "Sem preenchimento");
+
+            return { ...aluno, ultimaData: ultimaDataReal };
+    });
+
     useEffect(() => {
         if (!usuario) {
             navigate('/');
+        } else if (usuario.role !== 'tutor') {
+            alert("Acesso negado. Esta página é exclusiva para tutores.");
+            if (usuario.role === 'coordenador') navigate('/coordenador');
+            else if (usuario.role === 'bolsista') navigate('/bolsista');
+            else if (usuario.role === 'aluno') navigate('/aluno');
+            else navigate('/');
         }
     }, [usuario, navigate]);
 
@@ -24,20 +46,14 @@ function AlunosTutor() {
         navigate('/');
     };
 
-    // dados fictícios pra preencher a tabela
-    const listaAlunos = [
-        { id: 1, nome: "João Silva", email: "joao@teste.email.com", matricula: "123456", forms: 2 },
-        { id: 2, nome: "Maria Souza", email: "maria@teste.email.com", matricula: "654321", forms: 0 },
-        { id: 3, nome: "Pedro Santos", email: "pedro@teste.email.com", matricula: "123789", forms: 5 },
-        { id: 4, nome: "Ana Clara", email: "ana@teste.email.com", matricula: "987654", forms: 2 },
-    ];
-
     const gradientStyle = {
         background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)',
         color: 'white'
     };
 
-    if (!usuario) return <div className="p-5 text-center">Carregando...</div>;
+    if (!usuario || usuario.role !== 'tutor') {
+        return <div className="p-5 text-center">Verificando permissões...</div>;
+    }
 
     return (
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -51,10 +67,10 @@ function AlunosTutor() {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="text-center mx-auto fw-medium">
-                            <Nav.Link href="/home-tutor" className="mx-2 text-dark">Home</Nav.Link>
-                            <Nav.Link href="/alunos-tutor" className="mx-2 text-dark fw-bold">Alunos</Nav.Link>
-                            <Nav.Link href="/forms-tutor" className="mx-2 text-dark">Formulário de Acompanhamento</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/home-tutor')} className="mx-2 text-dark" style={{cursor: 'pointer'}}>Home</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/alunos-tutor')} className="mx-2 text-dark fw-bold" style={{cursor: 'pointer'}}>Alunos</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/forms-tutor')} className="mx-2 text-dark" style={{cursor: 'pointer'}}>Formulário</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/contato')} className="mx-2 text-dark" style={{cursor: 'pointer'}}>Contato</Nav.Link>
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
@@ -81,15 +97,15 @@ function AlunosTutor() {
                             </div>
                             <div>
                                 <h2 className="mb-1 fw-bold fs-3">{usuario.name}</h2>
-                                <Badge bg="light" text="primary" className="px-3 py-1">Tutor</Badge>
+                                <Badge bg="light" text="primary" className="mb-2 px-3 py-1">{usuario.role.toUpperCase()}</Badge>
                                 <p className="mb-0 text-light mt-1 opacity-75 small">
-                                    Estudante de eventos e networking
+                                    Tutor responsável pelo acompanhamento acadêmico.
                                 </p>
                             </div>
                         </Col>
                         <Col md={4} className="text-md-end mt-3 mt-md-0">
-                            <Button variant="primary" style={{ backgroundColor: '#004aad', borderColor: '#004aad' }} className="px-4 py-2" onClick={() => navigate('/editar-perfil')}>
-                                Editar Perfil
+                            <Button variant="outline-light" className="px-4 py-2 d-inline-flex align-items-center gap-2" onClick={() => navigate('/editar-perfil')}>
+                                Editar Perfil <FaPen size={12} />
                             </Button>
                         </Col>
                     </Row>
@@ -98,41 +114,62 @@ function AlunosTutor() {
 
             {/* --- TABELA --- */}
             <Container className="my-5 flex-grow-1">
-                <h2 className="text-primary fw-bold mb-4">Registro de Alunos</h2>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h2 className="text-primary fw-bold mb-0">Meus Alunos Tutorados</h2>
+                </div>
 
                 <div className="bg-white p-4 rounded-4 shadow-sm">
                     <Table responsive hover className="align-middle mb-0">
-                        <thead style={{ backgroundColor: '#0f52ba', color: 'white' }}>
-                            <tr>
-                                <th className="py-3 ps-3" style={{ backgroundColor: '#1565c0', color: 'white', borderRadius: '10px 0 0 0' }}>#</th>
-                                <th className="py-3" style={{ backgroundColor: '#1565c0', color: 'white' }}>Aluno(a)</th>
-                                <th className="py-3" style={{ backgroundColor: '#1565c0', color: 'white' }}>E-mail</th>
-                                <th className="py-3" style={{ backgroundColor: '#1565c0', color: 'white' }}>Matrícula</th>
-                                <th className="py-3 text-center" style={{ backgroundColor: '#1565c0', color: 'white' }}>Formulários<br />Preenchidos</th>
-                                <th className="py-3 text-end pe-4" style={{ backgroundColor: '#1565c0', color: 'white', borderRadius: '0 10px 0 0' }}>Ações</th>
+                        <thead>
+                            <tr style={{ borderBottom: '2px solid #0f52ba' }}>
+                                <th className="py-3 text-primary">Aluno(a)</th>
+                                <th className="py-3 text-primary">Matrícula</th>
+                                <th className="py-3 text-primary">Último Preenchimento</th>
+                                <th className="py-3 text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {listaAlunos.map((aluno, index) => (
-                                <tr key={aluno.id} style={{ borderBottom: '1px solid #dee2e6' }}>
-                                    <td className="ps-3 fw-bold text-muted">{index + 1}</td>
-                                    <td className="text-secondary fw-medium">{aluno.nome}</td>
-                                    <td className="text-muted">{aluno.email}</td>
-                                    <td className="text-muted">{aluno.matricula}</td>
-                                    <td className="text-center text-muted">{aluno.forms}</td>
-                                    <td className="text-end pe-3">
-                                        <Button
-                                            variant="primary"
-                                            size="sm"
-                                            className="d-inline-flex align-items-center gap-2 px-3 py-2 fw-bold"
-                                            style={{ backgroundColor: '#1565c0', borderColor: '#1565c0' }}
-                                            onClick={() => alert(`Preencher formulário para ${aluno.nome}`)}
-                                        >
-                                            <FaFileAlt /> Preencher Formulário
-                                        </Button>
+                            {listaAlunos.length > 0 ? (
+                                listaAlunos.map((aluno) => (
+                                    <tr key={aluno.id}>
+                                        <td className="py-3">
+                                            <div className="fw-bold text-dark">{aluno.nome}</div>
+                                            <div className="small text-muted">{aluno.email}</div>
+                                        </td>
+                                        <td className="text-muted">{aluno.matricula}</td>
+                                        <td>
+                                            <Badge bg={aluno.ultimaData === "Sem preenchimento" ? "secondary" : "info"} className="fw-normal">
+                                                {aluno.ultimaData}
+                                            </Badge>
+                                        </td>
+                                        <td className="text-end">
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <Button 
+                                                    variant="outline-primary" 
+                                                    size="sm"
+                                                    onClick={() => navigate('/forms-tutor', { state: { alunoNome: aluno.nome, matricula: aluno.matricula } })}
+                                                >
+                                                    <FaFileAlt className="me-1"/> Novo Form
+                                                </Button>
+                                                <Button 
+                                                    variant="primary" 
+                                                    size="sm" 
+                                                    style={{ backgroundColor: '#0f52ba' }}
+                                                    onClick={() => navigate('/relatorios-tutor', { state: { alunoId: aluno.id, nome: aluno.nome } })}
+                                                >
+                                                    <FaEye className="me-1"/> Ver Histórico
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="text-center py-4 text-muted">
+                                        Nenhum aluno vinculado à sua matrícula foi encontrado.
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </Table>
                 </div>
