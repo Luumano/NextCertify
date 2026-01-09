@@ -55,7 +55,14 @@ function AvaliacaoTutoria() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Avaliação enviada:", formData);
+        const avaliacaoSalvas = JSON.parse(localStorage.getItem("@App:avaliacao") || "[]");
+        const novaAvaliacao = {
+            ...formData,
+            id: Date.now(),
+        };
+
+        const listaAtualizada = [...avaliacaoSalvas, novaAvaliacao];
+        localStorage.setItem("@App:avaliacoes", JSON.stringify(listaAtualizada));
         alert(`Avaliação de ${formData.nome} salva com sucesso!`);
         navigate('/aluno');
     };

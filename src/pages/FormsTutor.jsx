@@ -52,10 +52,13 @@ function FormsTutor() {
         const novoRelatorio = {
             id: Date.now(),
             aluno: formData.aluno,
+            tutorNome: usuario.name,
             tutorMatricula: usuario?.matricula,
             matricula: location.state?.aluno?.matricula || "000000",
             data: dataAtual,
             status: "concluido",
+            dificuldadeTipo: formData.dificuldadeTipo,
+            encontrosTotais: Number(formData.virtuais) + Number(formData.presenciais),
             detalhes: formData
         };
 
@@ -64,7 +67,6 @@ function FormsTutor() {
         localStorage.setItem("relatorios_cadastrados", JSON.stringify(relatoriosSalvos));
         alert(`Relatório de ${formData.aluno} enviado com sucesso!`);
         navigate('/relatorios-tutor');
-
     };
 
     if (!usuario || usuario.role !== 'tutor') {

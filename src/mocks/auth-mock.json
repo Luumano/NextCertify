@@ -43,6 +43,15 @@
             "email": "ricardo.almeida@email.com",
             "password": "123456",
             "role": "coordenador"
+        },
+        {
+            "id": 6,
+            "name": "Carlos Almeida",
+            "matricula": "79999",
+            "email": "carlos.almeida@email.com",
+            "curso": "Sistemas de Informação",
+            "password": "123456",
+            "role": "tutor"
         }
     ]
 }

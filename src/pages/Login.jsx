@@ -15,9 +15,11 @@ function Login() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const { show, message, variant, alertKey, handleAlert } = useAlert();
+    //const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+       // setLoading(true);
 
         try {
             const user = await login(email, senha);
@@ -37,10 +39,14 @@ function Login() {
                 case 'aluno':
                     navigate('/aluno');
                     break;
+                default:
+                    navigate('/');
             }
         } catch (error) {
             handleAlert(error.message);
-        }
+        } //finally {
+           // setLoading(false);
+       // }
     };
 
     return (
