@@ -26,7 +26,7 @@ function MeusCertificados() {
         const listaGlobal = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
         
         // Mapeia os certificados do usuário e garante que o status esteja amigável para a tela
-        const meusCertificados = listaGlobal.filter(c => c.alunoId === usuario.id).map(c => {
+        const meusCertificados = listaGlobal.filter(c => String(c.alunoId) === String(usuario.id)).map(c => {
             let statusExibicao = c.status;
             if (c.status === 'pendente') statusExibicao = 'Em espera';
             if (c.status === 'negado') statusExibicao = 'Negado';
@@ -43,7 +43,7 @@ function MeusCertificados() {
     const persist = (listaAtualizada) => {
         if (!usuario) return;
         const listaGlobal = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
-        const listaSemOsMeus = listaGlobal.filter(c => c.alunoId !== usuario.id);
+        const listaSemOsMeus = listaGlobal.filter(c => String(c.alunoId) !== String(usuario.id));
         
         const certificadosComInfo = listaAtualizada.map(c => ({
             ...c,

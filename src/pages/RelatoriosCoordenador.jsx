@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Table, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Table, ListGroup, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import LogoNextCertify from '../img/NextCertify.png';
 import { useState, useEffect } from 'react';
@@ -30,19 +30,64 @@ function RelatoriosCoordenador() {
         const baseDados = { ...mockData };
         const relatoriosTutores = JSON.parse(localStorage.getItem("relatorios_cadastrados") || "[]");
         const avaliacoesReais = JSON.parse(localStorage.getItem("@App:avaliacoes") || "[]");
-        
+        const certificadosGlobais = JSON.parse(localStorage.getItem("lista_global_certificados") || "[]");
+        const aprovados = certificadosGlobais.filter(c => c.status === 'aprovado' || c.status === 'Aprovado');
+        const totalRelatorios = relatoriosTutores.length || 1;
+
+        const counts = { conteudo: 0, acesso: 0, funcionamento: 0, outras:0 };
+        relatoriosTutores.forEach(rel => {
+            if (rel.dificuldadeTipo === 'conteudo') counts.conteudo++;
+            if (rel.dificuldadeTipo === 'acesso') counts.acesso++;
+            // Adicione outras verificações conforme seu formulário
+        });
+
+        const novasDificuldades = [
+            { titulo: "Dificuldades Acadêmicas", desc: "Conteúdos específicos", perc: `${((counts.conteudo / totalRelatorios) * 100).toFixed(0)}%`, icon: "📚" },
+            { titulo: "Funcionamento da Universidade", desc: "Processos internos", perc: `${((counts.funcionamento / totalRelatorios) * 100).toFixed(0)}%`, icon: "🏫" },
+            { titulo: "Acesso a serviços", desc: "Portais e sistemas", perc: `${((counts.acesso / totalRelatorios) * 100).toFixed(0)}%`, icon: "🔐" },
+            { titulo: "Outras dificuldades", desc: "Diversos", perc: `${((counts.outras / totalRelatorios) * 100).toFixed(0)}%`, icon: "❓" }
+        ];
+
+        const categoriasHoras = { estudos: 0, eventos: 0, monitoria: 0};
+        aprovados.forEach(c => {
+            const h = parseFloat(c.horas) || 0;
+            if(c.titulo.toLowerCase().includes('monitoria')) categoriasHoras.monitoria += h;
+            else if(c.titulo.toLowerCase().includes('evento')) categoriasHoras.eventos += h;
+            else categoriasHoras.estudos += h;
+        });
+
+        baseDados.horasCertificado = [
+            { name: 'Total Horas', estudos: categoriasHoras.estudos, eventos: categoriasHoras.eventos, monitoria: categoriasHoras.monitoria }
+        ];
+
         if(relatoriosTutores.length > 0){
-            if(baseDados.metricas[1]){
-                baseDados.metricas[1].val = relatoriosTutores.length;
+            if(baseDados.metricas[2]){
+                baseDados.metricas[2].val = aprovados.length;
             }
 
-            baseDados.atividadesRecentes = relatoriosTutores.map(rel => ({
-                id: rel.id,
-                tutor: rel.tutorNome || "Tutor",
-                aluno: rel.aluno,
-                data: rel.data,
-                status: "Concluído"
-            })).reverse();
+            const listaTutorandosRelatorios = relatoriosTutores.map(rel => ({
+                id: rel.matricula,
+                nome: rel.aluno,
+                encontros: rel.encontrosTotais || 1,
+                semestre: "2025.1"
+            }));
+
+            const mapaTutores = {};
+            relatoriosTutores.forEach(rel => {
+                const nome = rel.tutorNome || "Tutor não identificado";
+                if(!mapaTutores[nome]){
+                    mapaTutores[nome] = { 
+                        id: rel.tutorMatricula, 
+                        nome: nome, 
+                        encontros: 0, 
+                        semestre: "2025.1"
+                    };
+                }
+                mapaTutores[nome].encontros += Number(rel.encontrosTotais || 1);
+            });
+
+            baseDados.tutores = Object.values(mapaTutores);
+            baseDados.tutorandos = listaTutorandosRelatorios;
 
             const counts = { conteudo: 0, acesso: 0, nenhuma: 0, outras: 0};
             relatoriosTutores.forEach(rel => {
@@ -52,10 +97,9 @@ function RelatoriosCoordenador() {
             });
 
             baseDados.graficoDificuldades = [
-                { name: 'Conteúdo', total: counts.conteudo },
-                { name: 'Acesso', total: counts.acesso },
-                { name: 'Nenhuma', total: counts.nenhuma },
-                { name: 'Outras', total: counts.outras },
+                { name: 'Conteúdo', sim: counts.conteudo, nao: relatoriosTutores.length - counts.conteudo },
+                { name: 'Acesso', sim: counts.acesso, nao: relatoriosTutores.length - counts.acesso },
+                { name: 'Outras', sim: counts.outras, nao: relatoriosTutores.length - counts.outras },
             ];
         }
 
@@ -64,16 +108,34 @@ function RelatoriosCoordenador() {
                 baseDados.metricas[0].val = avaliacoesReais.length;
             }
 
-            baseDados.tutorandos = avaliacoesReais.map(av => ({
-                id: av.email ? av.email.split('@')[0] : Math.random().toString(36).substr(2, 5),
+            const novosTutorandos = avaliacoesReais.map(av => ({
+                id: av.email ? av.email.split('@')[0] : "AVAL",
                 nome: av.nome,
                 encontros: 1,
                 semestre: "2025.1"
             }));
 
-            const somaExp = avaliacoesReais.reduce((acc, curr) => acc + Number(curr.experiencia), 0);
-            const mediaExp = (somaExp / avaliacoesReais.length).toFixed(0); 
+            baseDados.tutorandos = [...baseDados.tutorandos, ...novosTutorandos];
         }
+
+        const novasMetricas = [
+            { label: "Tutorandos Ativos", val: avaliacoesReais.length, icon: "🎓" },
+            { label: "Tutores", val: relatoriosTutores.length, icon: "🏫" },
+            { label: "Experiência da Tutoria", val: avaliacoesReais.length, icon: "😊" },
+            { label: "Encontros Realizados", val: relatoriosTutores.reduce((acc, curr) => acc + Number(curr.encontrosTotais || 0), 0), icon: "📅" },
+            { label: "Certificados", val: certificadosGlobais.length, icon: "🏅" }
+        ];
+
+        setDadosDashboard(prev => ({
+            ...prev,
+            dificuldades: novasDificuldades
+        }));
+
+        setDadosDashboard(prev => ({
+            ...prev,
+            metricas: novasMetricas
+        }));
+
         setDadosDashboard({
             ...baseDados,
             usuario: { name: "Coordenador Geral" }
@@ -204,8 +266,6 @@ function RelatoriosCoordenador() {
         doc.save("relatorio_gestao_geral.pdf");
     };
 
-
-
     const handleLogout = () => {
             localStorage.removeItem("usuarioLogado");
             navigate('/');
@@ -304,21 +364,54 @@ function RelatoriosCoordenador() {
 
                     <Col md={6}>
                         <Card className="border-0 shadow-sm p-3 h-100">
-                            <h6 className="fw-bold text-dark">Horas por Certificados</h6>
+                            <h6 className="fw-bold text-dark">Apresentou Dificuldades</h6>
                             <ResponsiveContainer width="100%" height={200}>
-                                <LineChart data={dadosDashboard.horasCertificado}>
+                                <BarChart data={dadosDashboard.dificuldadesGrafico}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                    <YAxis axisLine={false} tickLine={false} />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
                                     <Tooltip />
-                                    <Line type="monotone" dataKey="estudos" stroke="#2563eb" strokeWidth={3} />
-                                    <Line type="monotone" dataKey="eventos" stroke="#06b6d4" strokeWidth={3} />
-                                    <Line type="monotone" dataKey="monitoria" stroke="#6366f1" strokeWidth={3} />
-                                </LineChart>
+                                    <Bar dataKey="sim" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="nao" fill="#9ca3af" radius={[4, 4, 0, 0]} />
+                                </BarChart>
                             </ResponsiveContainer>
                         </Card>
                     </Col>
                 </Row>
+
+                <Row className="mb-5">
+    <Col md={12}>
+        <Card className="border-0 shadow-sm p-3">
+            <h6 className="fw-bold mb-3">Certificados Enviados pelos Alunos (Validação)</h6>
+            <Table hover responsive borderless size="sm" className="text-muted">
+                <thead className="border-bottom">
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Título</th>
+                        <th>Horas</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {JSON.parse(localStorage.getItem("lista_global_certificados") || "[]").map((cert, i) => (
+                        <tr key={i}>
+                            <td>{cert.alunoNome}</td>
+                            <td>{cert.titulo}</td>
+                            <td>{cert.horas}h</td>
+                            <td>{cert.periodo}</td>
+                            <td>
+                                <Badge bg={cert.status === 'aprovado' ? 'success' : 'warning'}>
+                                    {cert.status}
+                                </Badge>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
+        </Card>
+    </Col>
+</Row>
 
                 {/* Tabela e Lista de Dificuldades */}
                 <Row className="mb-5 g-4">
@@ -361,22 +454,6 @@ function RelatoriosCoordenador() {
                                     ))}
                                 </tbody>
                             </Table>
-                        </Card>
-                    </Col>
-
-                    <Col md={6}>
-                        <Card className="border-0 shadow-sm p-3 h-100">
-                            <h6 className="fw-bold text-dark">Apresentou Dificuldades</h6>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <BarChart data={dadosDashboard.dificuldadesGrafico}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="sim" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="nao" fill="#9ca3af" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
                         </Card>
                     </Col>
 
