@@ -2,7 +2,7 @@ import React, { useState, useEffect, use } from "react";
 import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Form, Badge, ButtonGroup, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaBell, FaSignOutAlt, FaCertificate, FaCheckCircle, FaTimesCircle, FaSearch, FaCalendarAlt, FaClock, FaListUl, FaExclamationTriangle, FaUndo } from 'react-icons/fa';
-import mockCertificados from '/src/mocks/certificados-mock.json';
+//import mockCertificados from '/src/mocks/certificados-mock.json';
 import LogoNextCertify from '../img/NextCertify.png';
 
 function ValidarCertificados() {
@@ -203,7 +203,7 @@ function ValidarCertificados() {
                                             <Col md={7}>
                                                 <h5 className="fw-bold text-dark mb-1">{cert.titulo}</h5>
                                                 <div className="text-muted fw-bold small mb-1">
-                                                    Aluno: <span className="text-dark">{usuario.name || "Não informado"}</span>
+                                                    Aluno: <span className="text-dark">{cert.alunoNome || "Não informado"}</span>
                                                 </div>
                                                 {/*função para on=bservação da negação do certificado*/}
                                                 {cert.status === 'negado' && cert.observacao && (

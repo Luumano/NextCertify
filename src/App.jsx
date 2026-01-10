@@ -19,7 +19,6 @@ import EditarPerfil from './pages/EditarPerfil';
 import HomeBolsista from './pages/HomeBolsista';
 import RegistroAluno from './pages/RegistroAluno';
 import RegistroTutores from './pages/RegistroTutores';
-import AcompanhamentoTutor from './pages/AcompanhamentoTutor';
 import ValidarCertificados from './pages/ValidarCertificados';
 import RelatorioIndividualTutor from './pages/RelatorioIndividualTutor';
 import RelatorioGeralTutor from './pages/RelatorioGeralTutor';
@@ -58,7 +57,6 @@ function App() {
       <Route path="/relatorio-geral-tutor" element={<RelatorioGeralTutor />} />
       <Route path="/relatorio-individual-aluno" element={<RelatorioIndividualAluno />} />
       <Route path="/relatorio-geral-aluno" element={<RelatorioGeralAluno />} />
-      <Route path="/acompanhamento-tutor" element={<AcompanhamentoTutor />} />
       <Route path="/validar-certificados" element={<ValidarCertificados />} />
       <Route path="/predefinicoes" element={<Predefinicoes />} />
 

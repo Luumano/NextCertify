@@ -173,7 +173,7 @@ function HomeBolsista() {
                                 <Button
                                     variant="primary"
                                     className="px-4 py-2 w-100"
-                                    onClick={() => navigate('/acompanhamento-tutor')}
+                                    onClick={() => navigate('/relatorio-individual-tutor')}
                                 >
                                     Veja mais
                                 </Button>
