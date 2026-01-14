@@ -9,6 +9,7 @@ import mockData from '/src/mocks/relatorio-geral-tutor-mock';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
+import authMock from '../mocks/auth-mock.json';
 
 function RelatorioGeralTutor() {
     const navigate = useNavigate();
@@ -29,9 +30,90 @@ function RelatorioGeralTutor() {
     useEffect(() => {
         if (!usuario) return;
 
+        // Carregar relatórios de tutores
+        const relatorios = JSON.parse(localStorage.getItem("relatorios_cadastrados") || "[]");
+
+        // Calcular métricas
+        const totalTutorandos = new Set(relatorios.map(r => r.aluno)).size;
+        const totalEncontros = relatorios.reduce((sum, r) => sum + (r.encontrosTotais || 0), 0);
+        const totalTutores = authMock.users.filter(u => u.role === 'tutor').length;
+
+        const metricas = [
+            { label: "Tutorandos", val: totalTutorandos.toString(), icon: "🧑‍🎓" },
+            { label: "Encontros Realizados", val: totalEncontros.toString(), icon: "📅" },
+            { label: "Tutores Cadastrados", val: totalTutores.toString(), icon: "👨‍🏫" }
+        ];
+
+        // Gráficos de encontros (agregar por mês)
+        const encontrosPorMes = {};
+        relatorios.forEach(r => {
+            const mes = new Date(r.data).toLocaleString('default', { month: 'short' });
+            if (!encontrosPorMes[mes]) encontrosPorMes[mes] = { total: 0 };
+            encontrosPorMes[mes].total += r.encontrosTotais || 0;
+        });
+        const graficos = Object.keys(encontrosPorMes).length > 0 ? Object.keys(encontrosPorMes).map(mes => ({ name: mes, ...encontrosPorMes[mes] })) : mockData.graficos;
+
+        // Experiência gráfico
+        const experienciaPorMes = {};
+        relatorios.forEach(r => {
+            if (r.detalhes && r.detalhes.experiencia) {
+                const mes = new Date(r.data).toLocaleString('default', { month: 'short' });
+                if (!experienciaPorMes[mes]) experienciaPorMes[mes] = { boa: 0, ruim: 0 };
+                if (parseInt(r.detalhes.experiencia) > 50) experienciaPorMes[mes].boa++;
+                else experienciaPorMes[mes].ruim++;
+            }
+        });
+        const experienciaGrafico = Object.keys(experienciaPorMes).length > 0 ? Object.keys(experienciaPorMes).map(mes => ({ name: mes, ...experienciaPorMes[mes] })) : mockData.experienciaGrafico;
+
+        // Dificuldades gráfico
+        const dificuldadesPorMes = {};
+        relatorios.forEach(r => {
+            const mes = new Date(r.data).toLocaleString('default', { month: 'short' });
+            if (!dificuldadesPorMes[mes]) dificuldadesPorMes[mes] = { sim: 0, nao: 0 };
+            if (r.dificuldadeTipo && r.dificuldadeTipo !== 'selecionar') dificuldadesPorMes[mes].sim++;
+            else dificuldadesPorMes[mes].nao++;
+        });
+        const dificuldadesGrafico = Object.keys(dificuldadesPorMes).length > 0 ? Object.keys(dificuldadesPorMes).map(mes => ({ name: mes, ...dificuldadesPorMes[mes] })) : mockData.dificuldadesGrafico;
+
+        // Dificuldades (contar tipos)
+        const dificuldadesCount = {};
+        relatorios.forEach(r => {
+            if (r.dificuldadeTipo) {
+                dificuldadesCount[r.dificuldadeTipo] = (dificuldadesCount[r.dificuldadeTipo] || 0) + 1;
+            }
+        });
+        const totalDificuldades = relatorios.length;
+        const dificuldades = Object.keys(dificuldadesCount).map(tipo => ({
+            icon: "📚", // Placeholder
+            titulo: tipo,
+            desc: "Descrição",
+            perc: totalDificuldades > 0 ? `${Math.round((dificuldadesCount[tipo] / totalDificuldades) * 100)}%` : "0%"
+        }));
+
+        // Tutores e Alunos do auth-mock
+        const tutores = authMock.users.filter(u => u.role === 'tutor').map(u => ({
+            id: u.matricula,
+            nome: u.name,
+            encontros: relatorios.filter(r => r.tutorMatricula === u.matricula).reduce((sum, r) => sum + (r.encontrosTotais || 0), 0),
+            semestre: "2024.1" // Placeholder
+        }));
+
+        const alunos = authMock.users.filter(u => u.role === 'aluno').map(u => ({
+            id: u.matricula,
+            nome: u.name,
+            encontros: relatorios.filter(r => r.matricula === u.matricula).reduce((sum, r) => sum + (r.encontrosTotais || 0), 0),
+            semestre: "2024.1" // Placeholder
+        }));
+
         setDadosDashboard({
-            ...mockData,
-            usuario: { name: usuario.name }
+            usuario: { name: usuario.name },
+            metricas,
+            graficos,
+            experienciaGrafico,
+            dificuldadesGrafico,
+            dificuldades,
+            tutores,
+            tutorandos: alunos
         });
     }, [usuario]);
 
@@ -46,6 +128,15 @@ function RelatorioGeralTutor() {
         csv += "Indicador,Valor\n";
         dadosDashboard.metricas.forEach(m => {
             csv += `${m.label},${m.val}\n`;
+        });
+
+        csv += "\n";
+
+        //Tutores
+        csv += "Tutores\n";
+        csv += "Matrícula,Nome,Encontros,Semestre\n";
+        dadosDashboard.tutores.forEach(t => {
+            csv += `${t.id},${t.nome},${t.encontros},${t.semestre}\n`;
         });
 
         csv += "\n";
@@ -100,6 +191,25 @@ function RelatorioGeralTutor() {
             startY: 50,
             head: [["Indicador", "Valor"]],
             body: dadosDashboard.metricas.map(m => [m.label, m.val])
+        });
+
+        // Tutores
+        doc.setFontSize(14);
+        doc.text(
+            "Tutores",
+            14,
+            doc.lastAutoTable.finalY + 15
+        );
+
+        autoTable(doc, {
+            startY: doc.lastAutoTable.finalY + 20,
+            head: [["Matrícula", "Nome", "Encontros", "Semestre"]],
+            body: dadosDashboard.tutores.map(t => [
+                t.id,
+                t.nome,
+                t.encontros,
+                t.semestre
+            ])
         });
 
         // Tutorandos
@@ -216,8 +326,7 @@ function RelatorioGeralTutor() {
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} />
                                     <YAxis axisLine={false} tickLine={false} />
                                     <Tooltip />
-                                    <Line type="monotone" dataKey="online" stroke="#00c6fb" strokeWidth={3} dot={false} />
-                                    <Line type="monotone" dataKey="presencial" stroke="#005bea" strokeWidth={3} dot={false} />
+                                    <Line type="monotone" dataKey="total" stroke="#00c6fb" strokeWidth={3} dot={false} />
                                 </LineChart>
                             </ResponsiveContainer>
                         </Card>
@@ -226,15 +335,15 @@ function RelatorioGeralTutor() {
 
                     <Col md={6}>
                         <Card className="border-0 shadow-sm p-3 h-100">
-                            <h6 className="fw-bold text-dark">Experiência da Tutoria</h6>
+                            <h6 className="fw-bold text-dark">Dificuldades Apresentadas</h6>
                             <ResponsiveContainer width="100%" height={200}>
-                                <LineChart data={dadosDashboard.experienciaGrafico}>
+                                <LineChart data={dadosDashboard.dificuldadesGrafico}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} />
                                     <YAxis axisLine={false} tickLine={false} />
                                     <Tooltip />
-                                    <Line type="monotone" dataKey="boa" stroke="#28a745" strokeWidth={3} dot={false} />
-                                    <Line type="monotone" dataKey="ruim" stroke="#dc3545" strokeWidth={3} dot={false} />
+                                    <Line type="monotone" dataKey="sim" stroke="#dc3545" strokeWidth={3} dot={false} />
+                                    <Line type="monotone" dataKey="nao" stroke="#28a745" strokeWidth={3} dot={false} />
                                 </LineChart>
                             </ResponsiveContainer>
                         </Card>
@@ -285,23 +394,7 @@ function RelatorioGeralTutor() {
                         </Card>
                     </Col>
 
-                    <Col md={6}>
-                        <Card className="border-0 shadow-sm p-3 h-100">
-                            <h6 className="fw-bold text-dark">Apresentou Dificuldades</h6>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <BarChart data={dadosDashboard.dificuldadesGrafico}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="sim" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="nao" fill="#9ca3af" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </Card>
-                    </Col>
-
-                    <Col md={6}>
+                    <Col md={12}>
                         <Card className="border-0 shadow-sm p-3">
                             <h6 className="fw-bold mb-3">Maiores dificuldades dos tutorandos</h6>
                             <ListGroup variant="flush">

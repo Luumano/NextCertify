@@ -1,14 +1,15 @@
-import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Table, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Navbar, Nav, Image, Table, ListGroup, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import LogoNextCertify from '../img/NextCertify.png';
 import { useState, useEffect } from 'react';
-import { FaUserCircle, FaFilePdf, FaFileCsv, FaSignOutAlt } from 'react-icons/fa';
+import { FaUserCircle, FaFilePdf, FaFileCsv, FaSignOutAlt, FaSearch } from 'react-icons/fa';
 import { FaBell } from 'react-icons/fa6';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import mockData from '/src/mocks/relatorio-individual-aluno-mock';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
+import authMock from '/src/mocks/auth-mock.json';
 
 function RelatorioIndividualAluno() {
     const navigate = useNavigate();
@@ -23,22 +24,80 @@ function RelatorioIndividualAluno() {
         horasCertificado: []
     });
 
+    const [alunos, setAlunos] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredAlunos, setFilteredAlunos] = useState([]);
+    const [alunoSelecionado, setAlunoSelecionado] = useState(null);
+
     useEffect(() => {
-        if (!usuario) return;
+        const alunoAtual = alunoSelecionado || usuario;
+        if (!alunoAtual) return;
+
+        const listaGlobalCertificados = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
+        const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(alunoAtual.id));
+
+        const avaliacoes = JSON.parse(localStorage.getItem("@App:avaliacao") || "[]");
+        const minhasAvaliacoes = avaliacoes.filter(a => a.email === alunoAtual.email);
+
+        const metricas = [
+            { label: "Tutorando", val: alunoAtual.name, icon: "🧑‍🎓" },
+            { label: "Curso", val: alunoAtual.curso || "Não informado", icon: "💻" },
+            { label: "Bolsista", val: "Carlos", icon: "👩‍🏫" },
+            { label: "Encontros Realizados", val: minhasAvaliacoes.length > 0 ? minhasAvaliacoes.length.toString() : "0", icon: "📅" },
+            { label: "Certificados", val: meusCertificados.length > 0 ? meusCertificados.length.toString() : "0", icon: "🏅" },
+            { label: "Mantém tutoria?", val: minhasAvaliacoes.length > 0 ? (minhasAvaliacoes[minhasAvaliacoes.length - 1].permanecer === 'sim' ? 'Sim' : 'Não') : 'Não informado', icon: "📚" },
+            { label: "Maior dificuldade", val: minhasAvaliacoes.length > 0 ? minhasAvaliacoes[minhasAvaliacoes.length - 1].dificuldade : 'Não informado', icon: "🤯" },
+            { label: "Avaliação do Tutor", val: minhasAvaliacoes.length > 0 ? `${Math.round(minhasAvaliacoes.reduce((sum, a) => sum + parseInt(a.avaliacaoTutor || 0), 0) / minhasAvaliacoes.length)}%` : 'Não informado', icon: "🏅" }
+        ];
+
+        const horasPorMes = {};
+        meusCertificados.forEach(cert => {
+            const mes = new Date(cert.periodo).toLocaleString('default', { month: 'short' });
+            if (!horasPorMes[mes]) horasPorMes[mes] = { estudos: 0, eventos: 0, monitoria: 0 };
+            const categoria = cert.titulo.toLowerCase().includes('estudo') ? 'estudos' : cert.titulo.toLowerCase().includes('evento') ? 'eventos' : 'monitoria';
+            horasPorMes[mes][categoria] += parseInt(cert.horas) || 0;
+        });
+        const horasCertificado = Object.keys(horasPorMes).length > 0 ? Object.keys(horasPorMes).map(mes => ({ name: mes, ...horasPorMes[mes] })) : mockData.horasCertificado; // Fallback to mock if no data
+
+        // Experiência gráfico (boa/ruim baseado em experiencia >50)
+        const experienciaPorMes = {};
+        minhasAvaliacoes.forEach(av => {
+            const mes = new Date(av.data).toLocaleString('default', { month: 'short' });
+            if (!experienciaPorMes[mes]) experienciaPorMes[mes] = { boa: 0, ruim: 0 };
+            if (parseInt(av.experiencia) > 50) experienciaPorMes[mes].boa++;
+            else experienciaPorMes[mes].ruim++;
+        });
+        const experienciaGrafico = Object.keys(experienciaPorMes).length > 0 ? Object.keys(experienciaPorMes).map(mes => ({ name: mes, ...experienciaPorMes[mes] })) : mockData.experienciaGrafico;
+
+        const encontrosPorMes = {};
+        minhasAvaliacoes.forEach(av => {
+            const mes = new Date(av.data).toLocaleString('default', { month: 'short' });
+            if (!encontrosPorMes[mes]) encontrosPorMes[mes] = { online: 0, presencial: 0 };
+            encontrosPorMes[mes].online++;
+        });
+        const graficos = Object.keys(encontrosPorMes).length > 0 ? Object.keys(encontrosPorMes).map(mes => ({ name: mes, ...encontrosPorMes[mes] })) : mockData.graficos;
 
         setDadosDashboard({
-            ...mockData,
-            usuario: { name: usuario.name }
+            usuario: { name: alunoAtual.name },
+            metricas,
+            graficos,
+            experienciaGrafico,
+            horasCertificado
         });
-    }, [usuario]);
+
+        setAlunos(authMock.users.filter(u => u.role === 'aluno'));
+    }, [usuario, alunoSelecionado]);
+
+    useEffect(() => {
+        setFilteredAlunos(alunos.filter(aluno => 
+            aluno.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            aluno.matricula.includes(searchTerm)
+        ));
+    }, [searchTerm, alunos]);
 
     const downloadCSV = () => {
         let csv = "";
-
-        // Título do CSV
         csv += "Relatório Aluno\n\n";
-
-        //resumo e métricas
         csv += "Resumo Geral\n";
         csv += "Indicador,Valor\n";
         dadosDashboard.metricas.forEach(m => {
@@ -46,24 +105,14 @@ function RelatorioIndividualAluno() {
         });
 
         csv += "\n";
-
-        //Tutorandos
-        csv += "Tutorandos\n";
-        csv += "Matrícula,Nome,Encontros,Semestre\n";
-        dadosDashboard.tutorandos.forEach(t => {
-            csv += `${t.id},${t.nome},${t.encontros},${t.semestre}\n`;
+        csv += "Certificados\n";
+        csv += "Título,Período,Horas,Status\n";
+        const listaGlobalCertificados = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
+        const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(usuario.id));
+        meusCertificados.forEach(c => {
+            csv += `${c.titulo},${c.periodo},${c.horas},${c.status}\n`;
         });
 
-        csv += "\n";
-
-        //Dificuldades
-        csv += "Maiores Dificuldades dos Tutorandos\n";
-        csv += "Dificuldade,Percentual\n";
-        dadosDashboard.dificuldades.forEach(d => {
-            csv += `${d.titulo},${d.perc}\n`;
-        });
-
-        //Download
         const blob = new Blob(["\uFEFF" + csv], {
             type: "text/csv;charset=utf-8;"
         });
@@ -71,7 +120,7 @@ function RelatorioIndividualAluno() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "relatorio_aluno.csv";
+        link.download = `${dadosDashboard.usuario.name}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -80,16 +129,10 @@ function RelatorioIndividualAluno() {
 
     const downloadPDF = () => {
         const doc = new jsPDF();
-
-        // Título
         doc.setFontSize(18);
         doc.text("Relatório Aluno", 14, 20);
-
-        // Subtítulo
         doc.setFontSize(12);
         doc.text(`Aluno: ${dadosDashboard.usuario.name}`, 14, 30);
-
-        // Métricas
         doc.setFontSize(14);
         doc.text("Resumo Geral", 14, 45);
 
@@ -99,39 +142,24 @@ function RelatorioIndividualAluno() {
             body: dadosDashboard.metricas.map(m => [m.label, m.val])
         });
 
-        // Tutorandos
         doc.setFontSize(14);
         doc.text(
-            "Tutorandos",
+            "Certificados",
             14,
             doc.lastAutoTable.finalY + 15
         );
 
-        autoTable(doc, {
-            startY: doc.lastAutoTable.finalY + 20,
-            head: [["Matrícula", "Nome", "Encontros", "Semestre"]],
-            body: dadosDashboard.tutorandos.map(t => [
-                t.id,
-                t.nome,
-                t.encontros,
-                t.semestre
-            ])
-        });
-
-        // Dificuldades
-        doc.setFontSize(14);
-        doc.text(
-            "Maiores Dificuldades dos Tutorandos",
-            14,
-            doc.lastAutoTable.finalY + 15
-        );
+        const listaGlobalCertificados = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
+        const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(usuario.id));
 
         autoTable(doc, {
             startY: doc.lastAutoTable.finalY + 20,
-            head: [["Dificuldade", "Percentual"]],
-            body: dadosDashboard.dificuldades.map(d => [
-                d.titulo,
-                d.perc
+            head: [["Título", "Período", "Horas", "Status"]],
+            body: meusCertificados.map(c => [
+                c.titulo,
+                c.periodo,
+                c.horas,
+                c.status
             ])
         });
 
@@ -179,7 +207,14 @@ function RelatorioIndividualAluno() {
             </Navbar>
 
             <Container className="flex-grow-1">
-                <h2 className="text-primary fw-bold mb-4" style={{ fontSize: '2.5rem' }}>Relatório Aluno</h2>
+                <h2 className="text-primary fw-bold mb-4" style={{ fontSize: '2.5rem' }}>
+                    Relatório {alunoSelecionado ? `de ${alunoSelecionado.name}` : 'Aluno'}
+                    {alunoSelecionado && (
+                        <Button variant="outline-secondary" size="sm" className="ms-3" onClick={() => setAlunoSelecionado(null)}>
+                            Voltar ao Meu Relatório
+                        </Button>
+                    )}
+                </h2>
 
                 {/* Métricas Superiores */}
                 <Row className="g-3 mb-4">
@@ -254,6 +289,38 @@ function RelatorioIndividualAluno() {
                             </ResponsiveContainer>
                         </Card>
                     </Col>
+                    <Col md={6}>
+                        <Card className="border-0 shadow-sm p-3 h-100">
+                            <h6 className="fw-bold text-dark">Pesquisar Alunos Cadastrados</h6>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Buscar por nome ou matrícula"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </Form.Group>
+                            <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                {filteredAlunos.length > 0 ? (
+                                    <ListGroup variant="flush">
+                                        {filteredAlunos.map(aluno => (
+                                            <ListGroup.Item key={aluno.id} className="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>{aluno.name}</strong> - {aluno.matricula}
+                                                </div>
+                                                <Button variant="outline-primary" size="sm" onClick={() => setAlunoSelecionado(aluno)}>
+                                                    <FaSearch /> Ver Relatório
+                                                </Button>
+                                            </ListGroup.Item>
+                                        ))}
+                                    </ListGroup>
+                                ) : (
+                                    <p className="text-muted">Nenhum aluno encontrado.</p>
+                                )}
+                            </div>
+                        </Card>
+                    </Col>
+
                 </Row>
 
                 <div className="d-flex gap-3 mb-5">
