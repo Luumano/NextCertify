@@ -25,7 +25,7 @@ function Login() {
             const user = await login(email, senha);
             alert(`Bem-vindo de volta ${user.name}`);
 
-            //Lógica para redirecionamento dos usuários baseados nos ROLEs
+            //Lógica para redirecionamento dos usuários baseados nos ROLES
             switch(user.role){
                 case 'coordenador':
                     navigate('/coordenador');

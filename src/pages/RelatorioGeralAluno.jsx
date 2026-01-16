@@ -54,7 +54,7 @@ function RelatorioGeralAluno() {
             id: a.matricula || "ALU-00",
             nome: a.name,
             encontros: relatoriosTutores.filter(r => r.alunoNome === a.name).length,
-            semestre: "2025.1"
+            semestre: a.semestre || "N/I"
         }));
 
         const metricasAtualizadas = [
@@ -81,25 +81,57 @@ function RelatorioGeralAluno() {
     };
 
     const downloadCSV = () => {
-        let csv = "\uFEFFRelatório Geral de Alunos\n\n";
-        csv += "Resumo Geral\nIndicador,Valor\n";
-        dadosDashboard.metricas.forEach(m => csv += `${m.label},${m.val}\n`);
-        csv += "\nTutores\nMatrícula,Nome,Encontros\n";
-        dadosDashboard.tutores.forEach(t => csv += `${t.id},${t.nome},${t.encontros}\n`);
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const cargoEmitente = usuario.role === 'coordenador' ? 'Coordenador' : 'Bolsista';
+        let csv = "\uFEFFRelatório de Gestão Geral - Alunos e Tutores\n";
+        csv += `Data de Exportação: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n`;
+        csv += `Responsável: ${usuario.name} (${cargoEmitente})\n\n`;
+
+        csv += "--- Resumo Geral (Métricas) ---\n";
+        csv += "Indicador,Valor\n";
+        dadosDashboard.metricas.forEach(m => {
+            csv += `"${m.label}", "${m.val}"\n`;
+        });
+        csv += "\n";
+
+        csv += "--- Lista de Tutorandos ---\n";
+        csv += "Matrícula,Nome,Semestre\n";
+        dadosDashboard.tutorandos.forEach(t => {
+            csv += `"${t.id}", "${t.nome}", "${t.semestre}"\n`;
+        });
+        csv += "\n";
+
+        csv += "--- Avaliação dos Tutores ---\n";
+        csv += "Matrícula,Nome,Encontros Realizados,Média de Avaliação\n";
+        dadosDashboard.tutores.forEach(t => {
+            csv += `"${t.id}", "${t.nome}", "${t.encontros}", "${t.avaliacao}"\n`;
+        });
+        csv += "\n";
+
+        csv += "--- Mapeamento de Dificuldades dos Alunos ---\n";
+        csv += "Dificuldade,Descrição,Percentual\n";
+        dadosDashboard.dificuldades.forEach(d => {
+            csv += `"${d.titulo}", "${d.desc}", "${d.perc}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: "text/csv;charset=urf-8;"});
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
+        const dataArquivo = new Date().toISOString().split('T')[0];
         link.href = url;
-        link.download = `relatorio_alunos_${usuario?.name}.csv`;
+        link.download = `relatorio_geral_alunos_Resposavel:${usuario.name}_${dataArquivo}.csv`;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const downloadPDF = () => {
         const doc = new jsPDF();
+        const cargoEmitente = usuario.role === 'coordenador' ? 'Coordenador' : 'Bolsista';
         doc.setFontSize(18);
         doc.text("Relatório Geral de Alunos", 14, 20);
         doc.setFontSize(12);
-        doc.text(`Responsável: ${usuario?.name}`, 14, 30);
+        doc.text(`Responsável: ${usuario.name} (${cargoEmitente})`, 14, 30);
         autoTable(doc, {
             startY: 40,
             head: [["Indicador", "Valor"]],
@@ -109,8 +141,8 @@ function RelatorioGeralAluno() {
         doc.text("Lista de Tutorandos", 14, doc.lastAutoTable.finalY + 10);
         autoTable(doc, {
             startY: doc.lastAutoTable.finalY + 15,
-            head: [["Matrícula", "Nome", "Encontros", "Semestre"]],
-            body: dadosDashboard.tutorandos.map(t => [t.id, t.nome, t.encontros, t.semestre]),
+            head: [["Matrícula", "Nome", "Semestre"]],
+            body: dadosDashboard.tutorandos.map(t => [t.id, t.nome, t.semestre]),
         });
         doc.text("Avaliação dos Tutores", 14, doc.lastAutoTable.finalY + 10);
         autoTable(doc, {
@@ -119,7 +151,7 @@ function RelatorioGeralAluno() {
             body: dadosDashboard.avaliacaoTutores.map(av => [av.id, av.nome, av.avaliacao + "%"]),
         });
 
-        doc.save(`relatorio_geral_alunos_${new Date().toLocaleDateString()}.pdf`);
+        doc.save(`relatorio_geral_alunos_Responsavel:${usuario.name}_${new Date().toLocaleDateString()}.pdf`);
     };
 
     const gradientStyle = { background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)', color: 'white' };

@@ -168,7 +168,7 @@ function HomeBolsista() {
                                 <div className="mb-3">
                                     <FaFileAlt size={60} className="mb-3" style={{ color: "#e10d0d" }}/>
                                 </div>
-                                <h3 className="text-primary fw-bold mb-3">Relatório individual de Acompanhamento dos Tutores</h3>
+                                <h3 className="text-primary fw-bold mb-3">Relatório individual Acompanhamento dos Tutores</h3>
                                 <p className="text-muted mb-4">Relatório individual de acompanhamento dos tutores</p>
                                 <Button
                                     variant="primary"
@@ -186,7 +186,7 @@ function HomeBolsista() {
                                 <div className="mb-3">
                                     <FaFileAlt size={60} className="text-secondary mb-3" />
                                 </div>
-                                <h3 className="text-primary fw-bold mb-3">Relatório individual de Acompanhamento dos alunos</h3>
+                                <h3 className="text-primary fw-bold mb-3">Relatório individual Acompanhamento dos alunos</h3>
                                 <p className="text-muted mb-4">Relatório individual de acompanhamento dos alunos</p>
                                 <Button
                                     variant="primary"
@@ -222,7 +222,7 @@ function HomeBolsista() {
                                 <div className="mb-3">
                                     <FaFileAlt size={60} className="text-secondary mb-3" />
                                 </div>
-                                <h3 className="text-primary fw-bold mb-3">Relatório de Acompanhamento Geral dos alunos</h3>
+                                <h3 className="text-primary fw-bold mb-3">Relatório Acompanhamento Geral dos alunos</h3>
                                 <p className="text-muted mb-4">Relatório de acompanhamento geral dos alunos</p>
                                 <Button
                                     variant="primary"
@@ -240,7 +240,7 @@ function HomeBolsista() {
                                 <div className="mb-3">
                                     <FaFileAlt size={60} className="mb-3" style={{ color: "#e10d0d" }}/>
                                 </div>
-                                <h3 className="text-primary fw-bold mb-3">Relatório de Acompanhamento geral do tutor</h3>
+                                <h3 className="text-primary fw-bold mb-3">Relatório Acompanhamento geral do tutor</h3>
                                 <p className="text-muted mb-4">Relatório de acompanhamento geral do tutor</p>
                                 <Button
                                     variant="primary"
