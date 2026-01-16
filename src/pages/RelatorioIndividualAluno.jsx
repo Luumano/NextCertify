@@ -8,14 +8,14 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import mockData from '/src/mocks/relatorio-individual-aluno-mock';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 import authMock from '/src/mocks/auth-mock.json';
 
 function RelatorioIndividualAluno() {
     const navigate = useNavigate();
-    const { usuario, handleLogout } = useAuthenticatedUser();
+    const { usuario, setUsuario, handleLogout } = useAuthenticatedUser();
 
-    // Estados inicializados como vazios
     const [dadosDashboard, setDadosDashboard] = useState({
         usuario: { name: "" },
         metricas: [],
@@ -59,7 +59,6 @@ function RelatorioIndividualAluno() {
         });
         const horasCertificado = Object.keys(horasPorMes).length > 0 ? Object.keys(horasPorMes).map(mes => ({ name: mes, ...horasPorMes[mes] })) : mockData.horasCertificado; // Fallback to mock if no data
 
-        // Experiência gráfico (boa/ruim baseado em experiencia >50)
         const experienciaPorMes = {};
         minhasAvaliacoes.forEach(av => {
             const mes = new Date(av.data).toLocaleString('default', { month: 'short' });
@@ -96,82 +95,97 @@ function RelatorioIndividualAluno() {
     }, [searchTerm, alunos]);
 
     const downloadCSV = () => {
-        let csv = "";
-        csv += "Relatório Aluno\n\n";
-        csv += "Resumo Geral\n";
+        const alunoAlvo = alunoSelecionado || usuario;
+        const cargoEmitente = usuario.role === 'coordenador' ? 'Coordenador' : 'Bolsista';
+        
+        let csv = `--- Relatório Individual do Aluno - NEXTCERTIFY ---\n`;
+        csv += `Aluno: ${alunoAlvo.name}\n`;
+        csv += `Emitido por: ${usuario.name} (${cargoEmitente})\n`;
+        csv += `Data de emissão: ${new Date().toLocaleDateString()}\n\n`;
+
+        csv += "--- Resumo de Desempenho ---\n";
         csv += "Indicador,Valor\n";
         dadosDashboard.metricas.forEach(m => {
             csv += `${m.label},${m.val}\n`;
-        });
-
+        }) ;
         csv += "\n";
-        csv += "Certificados\n";
+
+        csv += "--- Certificados Validos ---\n";
         csv += "Título,Período,Horas,Status\n";
         const listaGlobalCertificados = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
-        const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(usuario.id));
+        const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(alunoAlvo.id));
         meusCertificados.forEach(c => {
             csv += `${c.titulo},${c.periodo},${c.horas},${c.status}\n`;
         });
 
-        const blob = new Blob(["\uFEFF" + csv], {
-            type: "text/csv;charset=utf-8;"
-        });
-
+        const blob = new Blob(["\uFEFF" +csv], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `${dadosDashboard.usuario.name}.csv`;
-        document.body.appendChild(link);
+        link.download = `relatorio_individual_${alunoAlvo.name.replace(/\s+/g, '_').toLowerCase()}_${new Date().toLocaleDateString()}.csv`;
         link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
     };
 
-    const downloadPDF = () => {
+    const downloadPDF = async () => {
+        const areaGraficos = document.getElementById('area-graficos');
+        const alunoAlvo = alunoSelecionado || usuario;
         const doc = new jsPDF();
+        const dataAtual = new Date().toLocaleDateString();
+        const cargoEmitente = usuario.role === 'coordenador' ? 'Coordenador' : 'Bolsista';
+
         doc.setFontSize(18);
-        doc.text("Relatório Aluno", 14, 20);
-        doc.setFontSize(12);
-        doc.text(`Aluno: ${dadosDashboard.usuario.name}`, 14, 30);
-        doc.setFontSize(14);
-        doc.text("Resumo Geral", 14, 45);
+        doc.setTextColor(26, 86, 219);
+        doc.text("Relatório Individual do Aluno - NEXTCERTIFY", 14, 20);
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Aluno: ${alunoAlvo.name}`, 14, 28);
+        doc.text(`Emitido por: ${usuario.name} (${cargoEmitente})`, 14, 34);
+        doc.text(`Data de emissão: ${dataAtual}`, 14, 40);
 
         autoTable(doc, {
-            startY: 50,
-            head: [["Indicador", "Valor"]],
-            body: dadosDashboard.metricas.map(m => [m.label, m.val])
+            startY: 46,
+            head: [['Indicador', 'Valor']],
+            body: dadosDashboard.metricas.map(m => [m.label, m.val]),
+            headStyles: { fillColor: [26, 86, 219] },
         });
 
-        doc.setFontSize(14);
-        doc.text(
-            "Certificados",
-            14,
-            doc.lastAutoTable.finalY + 15
-        );
+        if(areaGraficos){
+            try {
+                const canvas = await html2canvas(areaGraficos, { scale: 2 });
+                const imgData = canvas.toDataURL('image/png');
+                doc.addPage();
+                doc.setFontSize(16);
+                doc.setTextColor(0);
+                doc.text("Análise Evolutiva e Engajamento", 14, 15);
+                doc.addImage(imgData, 'PNG', 10, 25, 160, 90);
+            } catch (e) {
+                console.error("Falha ao capturar gráficos:", e);
+            }
+        }
 
         const listaGlobalCertificados = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
-        const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(usuario.id));
+        const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(alunoAlvo.id));
 
-        autoTable(doc, {
-            startY: doc.lastAutoTable.finalY + 20,
-            head: [["Título", "Período", "Horas", "Status"]],
-            body: meusCertificados.map(c => [
-                c.titulo,
-                c.periodo,
-                c.horas,
-                c.status
-            ])
-        });
-
-        // Rodapé
-        doc.setFontSize(10);
-        doc.text(
-            "© 2025 - NextCertify",
-            14,
-            doc.internal.pageSize.height - 10
-        );
-
-        doc.save("relatorio_aluno.pdf");
+        if(meusCertificados.length > 0){
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.text("Histórico de Certificados", 14, 15);
+            autoTable(doc, {
+                startY: 20,
+                head: [['Título', 'Período', 'Horas', 'Status']],
+                body: meusCertificados.map(c => [c.titulo, c.periodo, c.horas + "h", c.status]),
+                headStyles: { fillColor: [99, 102, 219] },
+            });
+        }      
+        
+        const pageCount = doc.internal.getNumberOfPages();
+        for(let i = 1; i <= pageCount; i++){
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.setTextColor(150);
+            doc.text(`Página ${i} de ${pageCount} - NextCertify © 2026`, 14, doc.internal.pageSize.height - 10);
+        }
+        doc.save(`relatorio_individual_aluno_Responsavel:${usuario.name}_${alunoAlvo.name.replace(/\s+/g, '_').toLowerCase()}.pdf`);
     };
 
     const gradientStyle = { background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)', color: 'white' };
@@ -187,7 +201,7 @@ function RelatorioIndividualAluno() {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="text-center mx-auto fw-medium">
-                            <Nav.Link href="#" className="mx-2 text-dark">Alunos</Nav.Link>
+                            <Nav.Link href="#" className="mx-2 text-dark">Home</Nav.Link>
                             <Nav.Link href="#" className="mx-2 text-dark">Tutores</Nav.Link>
                             <Nav.Link href="#" className="mx-2 text-dark">Predefinições</Nav.Link>
                             <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
@@ -196,7 +210,7 @@ function RelatorioIndividualAluno() {
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
                             <div className="d-flex align-items-center gap-2">
                                 <FaUserCircle size={32} className="text-primary" />
-                                <span className="fw-bold text-dark">{dadosDashboard.usuario.name}</span>
+                                <span className="fw-bold text-dark">{usuario?.name}</span>
                             </div>
                             <Button variant="outline-danger" size="sm" onClick={handleLogout} className="d-flex align-items-center gap-2">
                                 <FaSignOutAlt size={16} /> Sair
@@ -238,7 +252,7 @@ function RelatorioIndividualAluno() {
                 </Row>
 
                 {/* Gráficos */}
-                <Row className="mb-4 g-4">
+                <Row className="mb-4 g-4" id="area-graficos">
                     <Col md={6}>
                         <Card className="border-0 shadow-sm p-3 h-100">
                             <h6 className="fw-bold text-dark">Encontros Realizados</h6>
