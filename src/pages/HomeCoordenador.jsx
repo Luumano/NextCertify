@@ -19,14 +19,14 @@ function HomeCoordenador() {
         const savedUser = localStorage.getItem("usuarioLogado");
         const userParsed = savedUser ? JSON.parse(savedUser) : null;
 
-        if(!userParsed){
+        if (!userParsed) {
             navigate('/');
-        } else if(userParsed.role !== 'coordenador'){
+        } else if (userParsed.role !== 'coordenador') {
             alert("Acesso restrito: Você não tem permissão de coordenador.");
 
-            if(userParsed.role === 'tutor') navigate('/home-tutor');
-            else if(userParsed.role === 'bolsista') navigate('/bolsista');
-            else if(userParsed.role === 'aluno') navigate('/aluno');
+            if (userParsed.role === 'tutor') navigate('/home-tutor');
+            else if (userParsed.role === 'bolsista') navigate('/bolsista');
+            else if (userParsed.role === 'aluno') navigate('/aluno');
             else navigate('/');
         }
     }, [navigate]);
@@ -113,7 +113,7 @@ function HomeCoordenador() {
                                 <Button
                                     variant="primary"
                                     className="px-4 py-2 w-100"
-                                    onClick={() => navigate('')}
+                                    onClick={() => navigate('/registro-aluno')}
                                 >
                                     Veja mais
                                 </Button>
@@ -134,7 +134,7 @@ function HomeCoordenador() {
                                 <Button
                                     variant="primary"
                                     className="px-4 py-2 w-100"
-                                    onClick={() => navigate('')}
+                                    onClick={() => navigate('/registro-tutores')}
                                 >
                                     Veja mais
                                 </Button>
@@ -155,7 +155,7 @@ function HomeCoordenador() {
                                 <Button
                                     variant="primary"
                                     className="px-4 py-2 w-100"
-                                    onClick={() => navigate('')}
+                                    onClick={() => navigate('/predefinicoes')}
                                 >
                                     Veja mais
                                 </Button>
@@ -263,7 +263,7 @@ function HomeCoordenador() {
                         <Card className="h-100 border-0 shadow-sm rounded-4 p-4">
                             <Card.Body>
                                 <div className="mb-3">
-                                    <FaFileAlt size={60} className="mb-3" style={{ color: "#e10d0d" }}/>
+                                    <FaFileAlt size={60} className="mb-3" style={{ color: "#e10d0d" }} />
                                 </div>
                                 <h3 className="text-primary fw-bold mb-3">Relatório de Acompanhamento geral do tutor</h3>
                                 <p className="text-muted mb-4">Relatório Acompanhamento geral do tutor</p>
