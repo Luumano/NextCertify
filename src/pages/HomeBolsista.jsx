@@ -53,7 +53,7 @@ function HomeBolsista() {
                         <Nav className="text-center mx-auto fw-medium">
                             <Nav.Link href="#" className="mx-2 text-dark">Alunos</Nav.Link>
                             <Nav.Link href="#" className="mx-2 text-dark">Tutores</Nav.Link>
-                            <Nav.Link href="#" className="mx-2 text-dark">Predefinições</Nav.Link>
+                            <Nav.Link href="/predefinicoes" className="mx-2 text-dark">Predefinições</Nav.Link>
                             <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
@@ -155,7 +155,7 @@ function HomeBolsista() {
                                 <Button
                                     variant="primary"
                                     className="px-4 py-2 w-100"
-                                    onClick={() => navigate('')}
+                                    onClick={() => navigate('/predefinicoes')}
                                 >
                                     Veja mais
                                 </Button>
