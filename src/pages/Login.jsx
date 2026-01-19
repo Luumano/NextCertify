@@ -23,11 +23,11 @@ function Login() {
             body: JSON.stringify({ email, senha }),
         });
 
-        if (!response.ok) {
-            throw new Error(response.statusText || "Usuário ou senha inválidos");
-        }
-
         const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Usuário ou senha inválidos");
+        }
 
         localStorage.setItem("token", data.token);
 
@@ -50,7 +50,7 @@ function Login() {
 
         if (route === "/bolsista") {
             const perfil = localStorage.getItem("perfil");
-            
+
             if (perfil === "ALUNO") {
                 navigate("/aluno");
                 return;
@@ -68,8 +68,12 @@ function Login() {
             const data = await login();
 
             const decoded = jwtDecode(data.token);
-            console.log(decoded);
-            
+
+            localStorage.setItem("usuarioLogado", JSON.stringify({
+                ...data.usuario,
+                role: decoded.role
+            }));
+
             navigateRole(decoded.role);
         } catch (error) {
             handleAlert(error?.message || "Usuário não encontrado!");

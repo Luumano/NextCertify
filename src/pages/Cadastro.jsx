@@ -85,11 +85,12 @@ function Cadastro() {
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-            throw new Error(response.statusText || "Erro na requisição POST");
-        }
-
         const data = await response.json();
+
+
+        if (!response.ok) {
+            throw new Error(data.error || "Erro na requisição POST");
+        }
 
         return data;
     };
