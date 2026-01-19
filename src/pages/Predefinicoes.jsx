@@ -4,153 +4,189 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import LogoNextCertify from '../img/NextCertify.png';
 import useAuthenticatedUser from "../hooks/useAuthenticatedUser";
+import mockAut from '../mocks/auth-mock.json';
+
 
 function Predefinicoes() {
     const { usuario, handleLogout } = useAuthenticatedUser();
+    const [categoriaSelecionada, setCategoriaSelecionada] = useState("");
+    const [horasCategoria, setHorasCategoria] = useState([]);
+    const [dataInicio, setDataInicio] = useState("");
+    const [dataFim, setDataFim] = useState("");
+    const [tutorSelecionado, setTutorSelecionado] = useState("");
+    const [alunoSelecionado, setAlunoSelecionado] = useState("");
+    const [tutores, setTutores] = useState([]);
+    const [alunos, setAlunos] = useState([]);
+    const [vinculos, setVinculos] = useState([]); 
 
-    if (!usuario) {
-        return <div className="p-5 text-center">Carregando...</div>;
-    }
+    useEffect(() => {
+        const usuariosLS = JSON.parse(localStorage.getItem("usuarios") || "[]");
+        const listaMock = Array.isArray(mockAut) ? mockAut : (mockAut.users || []);
+        const todosUsuarios = [...listaMock, ...usuariosLS];
 
-    return (
+        setTutores(todosUsuarios.filter(u => u.role === 'tutor'));
+        setAlunos(todosUsuarios.filter(u => u.role === 'aluno'));
+
+        const horasSalvas = JSON.parse(localStorage.getItem("predefinicoes_horas") || "{}");
+        setHorasCategoria(horasSalvas);
+        const vinculosSalvos = JSON.parse(localStorage.getItem("vinculos_tutoria") || "[]");
+        setVinculos(vinculosSalvos);
+    }, []);
+
+    const handleSalvarHoras = (e) => {
+        e.preventDefault();
+        localStorage.setItem("predefinicioes_horas", JSON.stringify(horasCategoria));
+        alert("Configuração de horas salva!");
+    };
+
+    const handleAtribuirTutoria = (e) => {
+        e.preventDefault();
+        if(!tutorSelecionado || !alunoSelecionado) return;
+
+        const novoVinculo = {
+            id: Date.now(),
+            tutorNome: tutorSelecionado,
+            alunoNome: alunoSelecionado,
+            dataInicio,
+            dataFim
+        };
+
+        const novosVinculos = [...vinculos, novoVinculo];
+        setVinculos(novoVinculo);
+        localStorage.setItem("vinculos_tutoria", JSON.stringify(novosVinculos));
+        alert("Vínculo criado com sucesso!");
+    };
+
+    const removerVinculo = (id) => {
+        const filtrados = vinculos.filter(v => v.id !== id);
+        setVinculos(filtrados);
+        localStorage.setItem("vinculos_tutoria", JSON.stringify(filtrados));
+    };
+
+    if (!usuario) return <div className='p-5 text-center'>Carregando....</div>
+
+
+  return (
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-
+            {/* Navbar mantida igual... */}
             <Navbar bg="white" expand="lg" className="shadow-sm py-3">
                 <Container fluid className="px-5">
-                    <Navbar.Brand href="#" className="d-flex align-items-center">
-                        <Image
-                            src={LogoNextCertify}
-                            alt="Logo NextCertify"
-                            height="40"
-                        />
-                    </Navbar.Brand>
-
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="text-center mx-auto fw-medium">
-                            <Nav.Link href="/registro-aluno" className="mx-2 text-dark">Alunos</Nav.Link>
-                            <Nav.Link href="/registro-tutores" className="mx-2 text-dark">Tutores</Nav.Link>
-                            <Nav.Link href="/predefinicoes" className="mx-2 text-dark">Predefinições</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
-                        </Nav>
-                        <div className="d-flex align-items-center gap-3">
-                            <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
-                            <div className="d-flex align-items-center gap-2">
-                                <FaUserCircle size={32} className="text-primary" />
-                                <span className="fw-bold text-dark">{usuario.name}</span>
-                            </div>
-                            <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
-                        </div>
-                    </Navbar.Collapse>
+                    <Navbar.Brand href="#"><Image src={LogoNextCertify} height="40" /></Navbar.Brand>
+                    <Nav className="mx-auto fw-medium d-none d-lg-flex">
+                        <Nav.Link href="/registro-aluno">Alunos</Nav.Link>
+                        <Nav.Link href="/registro-tutores">Tutores</Nav.Link>
+                        <Nav.Link href="/predefinicoes" className="text-primary">Predefinições</Nav.Link>
+                    </Nav>
+                    <div className="d-flex align-items-center gap-3">
+                        <span className="fw-bold">{usuario.name}</span>
+                        <Button variant="outline-danger" size="sm" onClick={handleLogout}><FaSignOutAlt /> Sair</Button>
+                    </div>
                 </Container>
             </Navbar>
 
             <Container className="my-5 flex-grow-1">
-                <h1 className="fw-bold mb-3" style={{ color: '#0f52ba' }}>Predefinições</h1>
+                <h1 className="fw-bold mb-4" style={{ color: '#0f52ba' }}>Configurações do Sistema</h1>
 
-                <Form className='mb-3'>
-                    <Row className='mb-3'>
-                        <h2 style={{ color: '#0f52ba' }}>Alunos</h2>
-
+                {/* SEÇÃO 1: AJUSTE DE HORAS POR CATEGORIA */}
+                <Form className='mb-5 p-4 bg-white rounded shadow-sm' onSubmit={handleSalvarHoras}>
+                    <h2 className="h4 mb-4" style={{ color: '#0f52ba' }}>Carga Horária por Categoria</h2>
+                    <Row>
                         <Col md={6} className='mb-3'>
-                            <Form.Group controlId='categoria'>
-                                <Form.Label className='fw-medium' style={{ color: '#0f52ba', fontSize: '1.1rem' }}>Categoria</Form.Label>
-                                <Form.Select defaultValue="Selecione a categoria" required>
-                                    <option value="">Selecione a categoria</option>
+                            <Form.Group>
+                                <Form.Label className='fw-bold'>Selecionar Categoria</Form.Label>
+                                <Form.Select 
+                                    value={categoriaSelecionada} 
+                                    onChange={(e) => setCategoriaSelecionada(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Escolha...</option>
                                     <option value="estudos">Estudos individuais</option>
                                     <option value="monitoria">Monitoria</option>
                                     <option value="evento">Eventos</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-
-                        <Col md={6}>
-                            <Form.Group controlId='carga-horaria'>
-                                <Form.Label className='fw-medium' style={{ color: '#0f52ba', fontSize: '1.1rem' }}>Carga horária mínima</Form.Label>
-
-                                <Form.Control type='number' min={0} disabled></Form.Control>
+                        <Col md={6} className='mb-3'>
+                            <Form.Group>
+                                <Form.Label className='fw-bold'>Horas Necessárias</Form.Label>
+                                <Form.Control 
+                                    type='number' 
+                                    disabled={!categoriaSelecionada}
+                                    value={horasCategoria[categoriaSelecionada] || ""}
+                                    onChange={(e) => setHorasCategoria({
+                                        ...horasCategoria,
+                                        [categoriaSelecionada]: e.target.value
+                                    })}
+                                    placeholder="Ex: 20"
+                                />
                             </Form.Group>
                         </Col>
                     </Row>
-
                     <div className="d-flex justify-content-end">
-                        <Button variant="primary" type="submit" style={{ borderRadius: '.4rem' }}>
-                            Salvar
-                        </Button>
+                        <Button variant="primary" type="submit"><FaSave className="me-2"/> Salvar Regra</Button>
                     </div>
                 </Form>
 
-                <Form className='mb-4'>
-                    <Row className='mb-3'>
-                        <h2 style={{ color: '#0f52ba' }}>Tutoria</h2>
-
-                        <Col md={6} className='mb-3'>
-                            <Form.Group controlId='data-inicio'>
-                                <Form.Label className='fw-medium' style={{ color: '#0f52ba', fontSize: '1.1rem' }}>Data de início</Form.Label>
-
-                                <Form.Control type='date'></Form.Control>
+                {/* SEÇÃO 2 & 3: DATAS E ATRIBUIÇÃO DE TUTOR */}
+                <Form className='mb-5 p-4 bg-white rounded shadow-sm' onSubmit={handleAtribuirTutoria}>
+                    <h2 className="h4 mb-4" style={{ color: '#0f52ba' }}>Vincular Tutor e Aluno</h2>
+                    <Row>
+                        <Col md={3} className='mb-3'>
+                            <Form.Group>
+                                <Form.Label className='fw-bold'>Data Início</Form.Label>
+                                <Form.Control type='date' value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} required />
                             </Form.Group>
                         </Col>
-
-                        <Col md={6} className='mb-3'>
-                            <Form.Group controlId='data-fim'>
-                                <Form.Label className='fw-medium' style={{ color: '#0f52ba', fontSize: '1.1rem' }}>Data final</Form.Label>
-
-                                <Form.Control type='date'></Form.Control>
+                        <Col md={3} className='mb-3'>
+                            <Form.Group>
+                                <Form.Label className='fw-bold'>Data Fim</Form.Label>
+                                <Form.Control type='date' value={dataFim} onChange={(e) => setDataFim(e.target.value)} required />
                             </Form.Group>
                         </Col>
-
-                        <Col md={6} className='mb-3'>
-                            <Form.Group controlId='tutor'>
-                                <Form.Label className='fw-medium' style={{ color: '#0f52ba', fontSize: '1.1rem' }}>Tutor</Form.Label>
-                                <Form.Select defaultValue="Selecione a categoria" required>
-                                    <option value="">Selecione o tutor</option>
-                                    <option value="...">...</option>
+                        <Col md={3} className='mb-3'>
+                            <Form.Group>
+                                <Form.Label className='fw-bold'>Tutor</Form.Label>
+                                <Form.Select value={tutorSelecionado} onChange={(e) => setTutorSelecionado(e.target.value)} required>
+                                    <option value="">Selecione...</option>
+                                    {tutores.map(t => <option key={t.matricula} value={t.name}>{t.name}</option>)}
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-
-                        <Col md={6} className='mb-3'>
-                            <Form.Group controlId='tutor'>
-                                <Form.Label className='fw-medium' style={{ color: '#0f52ba', fontSize: '1.1rem' }}>Tutor</Form.Label>
-                                <Form.Select defaultValue="Selecione a categoria" required>
-                                    <option value="">Selecione o tutor</option>
-                                    <option value="...">...</option>
+                        <Col md={3} className='mb-3'>
+                            <Form.Group>
+                                <Form.Label className='fw-bold'>Aluno</Form.Label>
+                                <Form.Select value={alunoSelecionado} onChange={(e) => setAlunoSelecionado(e.target.value)} required>
+                                    <option value="">Selecione...</option>
+                                    {alunos.map(a => <option key={a.matricula} value={a.name}>{a.name}</option>)}
                                 </Form.Select>
                             </Form.Group>
                         </Col>
                     </Row>
-
                     <div className="d-flex justify-content-end">
-                        <Button variant="primary" type="submit" style={{ borderRadius: '.4rem' }}>
-                            Salvar
-                        </Button>
+                        <Button variant="success" type="submit">Vincular Agora</Button>
                     </div>
                 </Form>
 
-                <Card className='mb-3'>
-                    <Card.Body>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div className="d-flex flex-column">
-                                <h4 className='text-primary'>Tutor: Germano</h4>
-                                <p className='mb-0'><strong>Aluno:</strong> Ícaro</p>
-                                <p><strong>Matrícula:</strong> 12345</p>
-                            </div>
-
+                {/* LISTA DE VÍNCULOS ATUAIS */}
+                <h2 className="h4 mb-3" style={{ color: '#0f52ba' }}>Atribuições Ativas</h2>
+                {vinculos.map((v) => (
+                    <Card key={v.id} className='mb-3 border-0 shadow-sm'>
+                        <Card.Body className="d-flex justify-content-between align-items-center">
                             <div>
-                                <Button variant="danger">
-                                    Remover
-                                </Button>
+                                <h5 className='text-primary mb-1'>Tutor: {v.tutorNome}</h5>
+                                <p className='mb-0 text-muted'>
+                                    <strong>Aluno:</strong> {v.alunoNome} | 
+                                    <strong> Período:</strong> {v.dataInicio} até {v.dataFim}
+                                </p>
                             </div>
-                        </div>
-                    </Card.Body>
-                </Card>
+                            <Button variant="outline-danger" onClick={() => removerVinculo(v.id)}>Remover</Button>
+                        </Card.Body>
+                    </Card>
+                ))}
             </Container>
 
-            <footer style={{ background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)', padding: '30px 0', textAlign: 'center', color: 'white' }} className="mt-auto">
-                <Container>
-                    <h5 className="mb-0">© 2025 - NextCertify</h5>
-                </Container>
+            <footer style={{ background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)', padding: '20px 0', textAlign: 'center', color: 'white' }}>
+                <Container><h5 className="mb-0 small">© 2025 - NextCertify</h5></Container>
             </footer>
         </div>
     );
