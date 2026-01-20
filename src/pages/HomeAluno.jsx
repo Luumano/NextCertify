@@ -10,18 +10,18 @@ function HomeAluno() {
 
     useEffect(() => {
         const savedUser = localStorage.getItem("usuarioLogado");
-        const userParsed = savedUser ? JSON.parse(savedUser) : null;
+        const userParsed = savedUser ? JSON.parse(savedUser) : null;
 
-        if (!userParsed) {
-            navigate('/');
-        } else if (userParsed.role !== 'aluno') {
-            alert("Acesso restrito: Você não tem permissão de aluno.");
-            const rotas = { tutor: '/home-tutor', bolsista: '/bolsista', coordenador: '/coordenador' };
-            navigate(rotas[userParsed.role] || '/');
-        } else {
-            setUsuario(userParsed); 
-        }
-    }, [navigate]);
+        if (!userParsed) {
+            navigate('/');
+        } else if (userParsed.role !== 'aluno') {
+            alert("Acesso restrito: Você não tem permissão de aluno.");
+            const rotas = { tutor: '/home-tutor', bolsista: '/bolsista', coordenador: '/coordenador' };
+            navigate(rotas[userParsed.role] || '/');
+        } else {
+            setUsuario(userParsed);
+        }
+    }, [navigate]);
 
 
     const handleLogout = () => {
@@ -57,7 +57,7 @@ function HomeAluno() {
                             <Nav.Link href="/aluno" className="mx-2 text-dark">Home</Nav.Link>
                             <Nav.Link href="/meus-certificados" className="mx-2 text-dark">Certificados</Nav.Link>
                             <Nav.Link href="/avaliacao-tutoria" className="mx-2 text-dark">Avaliação Tutoria</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />

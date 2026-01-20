@@ -38,10 +38,10 @@ function RegistroAluno() {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="text-center mx-auto fw-medium">
-                            <Nav.Link href="/registro-aluno" className="mx-2 text-dark">Alunos</Nav.Link>
-                            <Nav.Link href="/registro-tutores" className="mx-2 text-dark">Tutores</Nav.Link>
-                            <Nav.Link href="/predefinicoes" className="mx-2 text-dark">Predefinições</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+                            <Nav.Link href="/home-tutor" className="mx-2 text-dark">Home</Nav.Link>
+                            <Nav.Link href="/alunos-tutor" className="mx-2 text-dark">Alunos</Nav.Link>
+                            <Nav.Link href="/forms-tutor" className="mx-2 text-dark">Formulário de Acompanhamento</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/relatorios-tutor')} className="mx-2 text-dark">Relatórios</Nav.Link>
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
@@ -49,7 +49,9 @@ function RegistroAluno() {
                                 <FaUserCircle size={32} className="text-primary" />
                                 <span className="fw-bold text-dark">{usuario.name}</span>
                             </div>
-                            <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
+                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center gap-2" onClick={handleLogout}>
+                                <FaSignOutAlt size={16} /> Sair
+                            </Button>
                         </div>
                     </Navbar.Collapse>
                 </Container>

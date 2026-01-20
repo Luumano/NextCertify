@@ -54,7 +54,7 @@ function HomeCoordenador() {
                             <Nav.Link href="#" className="mx-2 text-dark">Alunos</Nav.Link>
                             <Nav.Link href="#" className="mx-2 text-dark">Tutores</Nav.Link>
                             <Nav.Link href="#" className="mx-2 text-dark">Predefinições</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />

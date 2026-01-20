@@ -24,7 +24,7 @@ function MeusCertificados() {
     useEffect(() => {
         if (!usuario) return;
         const listaGlobal = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
-    
+
         const meusCertificados = listaGlobal.filter(c => String(c.alunoId) === String(usuario.id)).map(c => {
             let statusExibicao = c.status;
             if (c.status === 'pendente') statusExibicao = 'Em espera';
@@ -43,7 +43,7 @@ function MeusCertificados() {
         if (!usuario) return;
         const listaGlobal = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
         const listaSemOsMeus = listaGlobal.filter(c => String(c.alunoId) !== String(usuario.id));
-        
+
         const certificadosComInfo = listaAtualizada.map(c => ({
             ...c,
             alunoId: usuario.id,
@@ -89,7 +89,7 @@ function MeusCertificados() {
             horas: formData.horas,
             fileName: tempFileData.name,
             fileData: tempFileData.data,
-            motivo: '' 
+            motivo: ''
         };
 
         const updated = [novo, ...certificados];
@@ -120,7 +120,7 @@ function MeusCertificados() {
         if (s === 'em espera' || s === 'pendente') return 'warning';
         return 'secondary';
     };
-    
+
     const handleLogout = () => {
         localStorage.removeItem("usuarioLogado");
         navigate('/');
@@ -130,26 +130,29 @@ function MeusCertificados() {
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Navbar bg="white" expand="lg" className="shadow-sm py-3">
                 <Container fluid className="px-5">
-                    <Navbar.Brand onClick={() => navigate('/aluno')} style={{ cursor: 'pointer' }}>
-                        <Image src={LogoNextCertify} alt="Logo" height="40" />
+                    <Navbar.Brand href="#" className="d-flex align-items-center">
+                        <Image
+                            src={LogoNextCertify}
+                            alt="Logo NextCertify"
+                            height="40"
+                        />
                     </Navbar.Brand>
-                    <Navbar.Toggle />
-                    <Navbar.Collapse>
+
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="text-center mx-auto fw-medium">
                             <Nav.Link href="/aluno" className="mx-2 text-dark">Home</Nav.Link>
-                            <Nav.Link className="mx-2 text-dark fw-bold">Certificados</Nav.Link>
-                            <Nav.Link href="/avaliacao-tutoria" className="mx-2 text-dark">Avaliar Tutoria</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+                            <Nav.Link href="/meus-certificados" className="mx-2 text-dark">Certificados</Nav.Link>
+                            <Nav.Link href="/avaliacao-tutoria" className="mx-2 text-dark">Avaliação Tutoria</Nav.Link>
+
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
-                            <FaBell size={20} className="text-primary" />
+                            <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
                             <div className="d-flex align-items-center gap-2">
                                 <FaUserCircle size={32} className="text-primary" />
-                                <span className="fw-bold text-dark">{usuario?.name || 'Usuário'}</span>
+                                <span className="fw-bold text-dark">{usuario.name}</span>
                             </div>
-                            <Button variant="outline-danger" size="sm" onClick={handleLogout} className="d-flex align-items-center gap-2">
-                                <FaSignOutAlt size={16} /> Sair
-                            </Button>
+                            <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
                         </div>
                     </Navbar.Collapse>
                 </Container>
@@ -177,8 +180,8 @@ function MeusCertificados() {
                                             </Badge>
                                         </div>
                                         <div className="d-flex gap-4 text-muted small fw-medium mb-1">
-                                            <span><FaCalendarAlt className="me-1 text-primary"/> {cert.periodo}</span>
-                                            <span><FaClock className="me-1 text-primary"/> {cert.horas}h</span>
+                                            <span><FaCalendarAlt className="me-1 text-primary" /> {cert.periodo}</span>
+                                            <span><FaClock className="me-1 text-primary" /> {cert.horas}h</span>
                                         </div>
 
                                         {/* AQUI APARECE A JUSTIFICATIVA SE ESTIVER NEGADO */}
@@ -217,19 +220,19 @@ function MeusCertificados() {
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label className="fw-bold small">Título / Nome do Curso</Form.Label>
-                            <Form.Control type="text" value={formData.titulo} onChange={(e) => setFormData({...formData, titulo: e.target.value})} />
+                            <Form.Control type="text" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} />
                         </Form.Group>
                         <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3">
                                     <Form.Label className="fw-bold small">Data de Conclusão</Form.Label>
-                                    <Form.Control type="date" onChange={(e) => setFormData({...formData, periodo: e.target.value})} />
+                                    <Form.Control type="date" onChange={(e) => setFormData({ ...formData, periodo: e.target.value })} />
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
                                 <Form.Group className="mb-3">
                                     <Form.Label className="fw-bold small">Carga Horária (horas)</Form.Label>
-                                    <Form.Control type="number" placeholder="Ex: 40" onChange={(e) => setFormData({...formData, horas: e.target.value})} />
+                                    <Form.Control type="number" placeholder="Ex: 40" onChange={(e) => setFormData({ ...formData, horas: e.target.value })} />
                                 </Form.Group>
                             </Col>
                         </Row>
