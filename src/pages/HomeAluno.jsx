@@ -3,7 +3,6 @@ import { FaBell, FaUserCircle, FaCertificate, FaClipboardCheck, FaPen, FaSignOut
 import { useNavigate } from 'react-router-dom';
 import LogoNextCertify from '../img/NextCertify.png';
 import { useState, useEffect } from 'react';
-import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 
 function HomeAluno() {
     const navigate = useNavigate();
@@ -43,7 +42,7 @@ function HomeAluno() {
         color: 'white'
     };
 
-    if (!usuario) {
+    if (!usuario || usuario.role !== 'aluno') {
         return <div className="p-5 text-center">Verificando permissões...</div>;
     }
 
@@ -72,7 +71,7 @@ function HomeAluno() {
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
                             <div className="d-flex align-items-center gap-2">
                                 <FaUserCircle size={32} className="text-primary" />
-                                <span className="fw-bold text-dark">{usuario.nome}</span>
+                                <span className="fw-bold text-dark">{usuario.name}</span>
                             </div>
                             <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
                         </div>
@@ -89,9 +88,9 @@ function HomeAluno() {
                                 <FaUserCircle size={80} />
                             </div>
                             <div>
-                                <h2 className="mb-1 fw-bold">{usuario.nome}</h2>
-                                <Badge bg="light" text="primary" className="mb-2 px-3 py-1">{userRole(usuario.role)}</Badge>
-                                {/* <p className="mb-0 text-light">Matrícula: {usuario.matricula}</p> */}
+                                <h2 className="mb-1 fw-bold">{usuario.name}</h2>
+                                <Badge bg="light" text="primary" className="mb-2 px-3 py-1">{usuario.role}</Badge>
+                                <p className="mb-0 text-light">Matrícula: {usuario.matricula}</p>
                             </div>
                         </Col>
                         <Col md={4} className="text-md-end mt-3 mt-md-0">
@@ -105,7 +104,7 @@ function HomeAluno() {
 
             <Container className="my-5 flex-grow-1">
                 <div className="mb-5">
-                    <h1 className="text-primary fw-bold">Seja bem-vindo {usuario.nome.split(' ')[0]}</h1>
+                    <h1 className="text-primary fw-bold">Seja bem-vindo {usuario.name.split(' ')[0]}</h1>
                     <p className="text-muted fs-5">
                         Aqui você pode realizar upload dos seus certificados e fazer a avaliação do projeto de tutoria.
                     </p>
