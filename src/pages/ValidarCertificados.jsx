@@ -95,7 +95,7 @@ function ValidarCertificados() {
             alert("Por favor, descreva ou selecione o motivo da rejeição");
             return;
         }
-        const novaLista = certificados.map(c => c.id === certSelecionado.id ? { ...c, status: 'negado', motivo: motivoNegativa } : c);
+        const novaLista = certificados.map(c => c.id === certSelecionado.id ? { ...c, status: 'negado', motivo: motivoNegativa, observacao: motivoNegativa } : c );
         setCertificados(novaLista);
         salvarCertificados(novaLista);
         fecharModal();
@@ -201,7 +201,12 @@ function ValidarCertificados() {
                                     <Card.Body className="p-4">
                                         <Row className="align-items-center">
                                             <Col md={7}>
-                                                <h5 className="fw-bold text-dark mb-1">{cert.titulo}</h5>
+                                                <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                                    <h5 className="fw-bold text-dark mb-1">{cert.titulo}</h5>
+                                                    <Badge bg="info" className="px-2 py-1 text-uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.5px'}}>
+                                                        {cert.categoria || 'Geral'}
+                                                    </Badge>
+                                                </div>
                                                 <div className="text-muted fw-bold small mb-1">
                                                     Aluno: <span className="text-dark">{cert.alunoNome || "Não informado"}</span>
                                                 </div>
