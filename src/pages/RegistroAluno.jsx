@@ -50,7 +50,9 @@ function RegistroAluno() {
                                 <FaUserCircle size={32} className="text-primary" />
                                 <span className="fw-bold text-dark">{usuario.name}</span>
                             </div>
-                            <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
+                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center gap-2" onClick={handleLogout}>
+                                <FaSignOutAlt size={16} /> Sair
+                            </Button>
                         </div>
                     </Navbar.Collapse>
                 </Container>

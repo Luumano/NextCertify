@@ -6,14 +6,11 @@ function useAuthenticatedUser() {
     const [usuario, setUsuario] = useState(null);
 
     useEffect(() => {
-        //Não apagar por enquanto para realizar os testes
-        // Pegar os dados salvos no LocalStorage
         const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 
         if (usuarioLogado) {
             setUsuario(usuarioLogado);
         } else {
-            // Vai retornar para login caso não tenha usuário logado
             navigate('/');
         }
     }, [navigate]);
@@ -23,8 +20,29 @@ function useAuthenticatedUser() {
         navigate('/');
     };
 
+    const userRole = (role) => {
+        const roleNames = {
+            student: "Aluno",
+            scholarship_holder: "Bolsista",
+            tutor: "Tutor",
+            coordinator: "Coordenador"
+        };
+
+        if (role === "scholarship_holder") {
+            const perfil = localStorage.getItem("perfil");
+
+            if (perfil === "ALUNO") {
+                return "Aluno";
+            }
+        }
+
+        return roleNames[role];
+    };
+
+
     const userAuthenticatedProps = {
         usuario,
+        userRole,
         handleLogout
     };
 

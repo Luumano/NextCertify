@@ -11,10 +11,9 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
-    "html2canvas": "^1.4.1",
-    "idb-keyval": "^6.2.2",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.2",
+    "jwt-decode": "^4.0.0",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.0",

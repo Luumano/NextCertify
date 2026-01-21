@@ -40,12 +40,12 @@ function RelatorioIndividualAluno() {
         if (!alunoAtual) return;
 
         const listaGlobalCertificados = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
-        const meusCertificados = listaGlobalCertificados.filter(c => 
+        const meusCertificados = listaGlobalCertificados.filter(c =>
             String(c.alunoId) === String(alunoAtual.id) || String(c.alunoId) === String(alunoAtual.matricula)
         );
 
         const avaliacoes = JSON.parse(localStorage.getItem("@App:avaliacao") || "[]");
-        const minhasAvaliacoes = avaliacoes.filter(a => 
+        const minhasAvaliacoes = avaliacoes.filter(a =>
             a.email === alunoAtual.email || a.alunoMatricula === alunoAtual.matricula
         );
         const ultimoEncontro = minhasAvaliacoes[minhasAvaliacoes.length - 1];
@@ -124,7 +124,7 @@ function RelatorioIndividualAluno() {
     }, [usuario, alunoSelecionado]);
 
     useEffect(() => {
-        setFilteredAlunos(alunos.filter(aluno => 
+        setFilteredAlunos(alunos.filter(aluno =>
             aluno.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             aluno.matricula.includes(searchTerm)
         ));
@@ -133,7 +133,7 @@ function RelatorioIndividualAluno() {
     const downloadCSV = () => {
         const alunoAlvo = alunoSelecionado || usuario;
         const cargoEmitente = usuario.role === 'coordenador' ? 'Coordenador' : 'Bolsista';
-        
+
         let csv = `--- Relatório Individual do Aluno - NEXTCERTIFY ---\n`;
         csv += `Aluno: ${alunoAlvo.name}\n`;
         csv += `Emitido por: ${usuario.name} (${cargoEmitente})\n`;
@@ -143,7 +143,7 @@ function RelatorioIndividualAluno() {
         csv += "Indicador,Valor\n";
         dadosDashboard.metricas.forEach(m => {
             csv += `${m.label},${m.val}\n`;
-        }) ;
+        });
         csv += "\n";
 
         csv += "--- Certificados Validos ---\n";
@@ -154,7 +154,7 @@ function RelatorioIndividualAluno() {
             csv += `${c.titulo},${c.periodo},${c.horas},${c.status}\n`;
         });
 
-        const blob = new Blob(["\uFEFF" +csv], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -185,7 +185,7 @@ function RelatorioIndividualAluno() {
             headStyles: { fillColor: [26, 86, 219] },
         });
 
-        if(areaGraficos){
+        if (areaGraficos) {
             try {
                 const canvas = await html2canvas(areaGraficos, { scale: 2 });
                 const imgData = canvas.toDataURL('image/png');
@@ -202,7 +202,7 @@ function RelatorioIndividualAluno() {
         const listaGlobalCertificados = JSON.parse(localStorage.getItem("lista_global_certificados")) || [];
         const meusCertificados = listaGlobalCertificados.filter(c => String(c.alunoId) === String(alunoAlvo.id));
 
-        if(meusCertificados.length > 0){
+        if (meusCertificados.length > 0) {
             doc.addPage();
             doc.setFontSize(14);
             doc.text("Histórico de Certificados", 14, 15);
@@ -212,10 +212,10 @@ function RelatorioIndividualAluno() {
                 body: meusCertificados.map(c => [c.titulo, c.periodo, c.horas + "h", c.status]),
                 headStyles: { fillColor: [99, 102, 219] },
             });
-        }      
-        
+        }
+
         const pageCount = doc.internal.getNumberOfPages();
-        for(let i = 1; i <= pageCount; i++){
+        for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(10);
             doc.setTextColor(150);

@@ -68,14 +68,14 @@ function AvaliacaoTutoria() {
 
     /*const handleChange = (e) => {
         const { id, value } = e.target;
-        
+
         // Lógica especial para salvar o nome do tutor junto com o ID
         if (id === "tutorId") {
             const tutorSelecionado = listaTutores.find(t => t.matricula === value);
-            setFormData({ 
-                ...formData, 
-                tutorId: value, 
-                tutorNome: tutorSelecionado ? tutorSelecionado.name : '' 
+            setFormData({
+                ...formData,
+                tutorId: value,
+                tutorNome: tutorSelecionado ? tutorSelecionado.name : ''
             });
         } else {
             setFormData({ ...formData, [id]: value });
@@ -126,11 +126,15 @@ function AvaliacaoTutoria() {
 
     return (
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            
+
             <Navbar bg="white" expand="lg" className="shadow-sm py-3">
                 <Container fluid className="px-5">
-                    <Navbar.Brand onClick={() => navigate('/aluno')} style={{ cursor: 'pointer' }}>
-                        <Image src={LogoNextCertify} alt="Logo" height="40" />
+                    <Navbar.Brand href="#" className="d-flex align-items-center">
+                        <Image
+                            src={LogoNextCertify}
+                            alt="Logo NextCertify"
+                            height="40"
+                        />
                     </Navbar.Brand>
                     <Navbar.Collapse>
                         <Nav className="text-center mx-auto fw-medium">
@@ -140,10 +144,10 @@ function AvaliacaoTutoria() {
                             <Nav.Link onClick={() => navigate('/contato')} className="mx-2 text-dark">Contato</Nav.Link>
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
-                            <FaBell size={20} className="text-primary" />
+                            <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
                             <div className="d-flex align-items-center gap-2">
                                 <FaUserCircle size={32} className="text-primary" />
-                                <span className="fw-bold">{formData.nome}</span>
+                                <span className="fw-bold text-dark">{usuario.name}</span>
                             </div>
                             <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
                         </div>
@@ -208,8 +212,8 @@ function AvaliacaoTutoria() {
                         <Col md={6}>
                             <Form.Label className="text-primary fw-bold">Deseja continuar no projeto em 2025.2?</Form.Label>
                             <div className="mt-2">
-                                <Form.Check inline label="Sim" name="perm" type="radio" checked={formData.permanecer === 'sim'} onChange={() => setFormData({...formData, permanecer: 'sim'})} />
-                                <Form.Check inline label="Não" name="perm" type="radio" checked={formData.permanecer === 'nao'} onChange={() => setFormData({...formData, permanecer: 'nao'})} />
+                                <Form.Check inline label="Sim" name="perm" type="radio" checked={formData.permanecer === 'sim'} onChange={() => setFormData({ ...formData, permanecer: 'sim' })} />
+                                <Form.Check inline label="Não" name="perm" type="radio" checked={formData.permanecer === 'nao'} onChange={() => setFormData({ ...formData, permanecer: 'nao' })} />
                             </div>
                         </Col>
                     </Row>

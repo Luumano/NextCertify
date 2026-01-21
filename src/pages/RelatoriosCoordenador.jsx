@@ -30,9 +30,9 @@ function RelatoriosCoordenador() {
 
     useEffect(() => {
         const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-        if(usuarioLogado) {
+        if (usuarioLogado) {
             setUsuario(usuarioLogado);
-        } else{
+        } else {
             navigate('/');
         }
 
@@ -128,12 +128,12 @@ function RelatoriosCoordenador() {
         navigate('/');
     };
 
-     const downloadCSV = () => {
+    const downloadCSV = () => {
         const cargo = usuario.role === 'coordenador' ? 'Coordenador' : 'Bolsista';
         let csv = `--- Relatório de Gestão Geral - NEXTCERTIFY ---\n`;
         csv += `Emitido por: ${usuario.name} (${cargo})\n`;
         csv += `Data: ${new Date().toLocaleDateString()}\n\n`;
-        
+
         csv += "--- Resumo Geral ---\n";
         csv += "Indicador,Valor\n";
         dadosDashboard.metricas.forEach(m => {
@@ -190,7 +190,7 @@ function RelatoriosCoordenador() {
             headStyles: { fillColor: [26, 86, 219] },
         });
 
-        if(areaGraficos){
+        if (areaGraficos) {
             try {
                 const canvas = await html2canvas(areaGraficos, { scale: 2 });
                 const imgData = canvas.toDataURL('image/png');
@@ -222,7 +222,7 @@ function RelatoriosCoordenador() {
         });
 
         const pageCount = doc.internal.getNumberOfPages();
-        for(let i = 1; i <= pageCount; i++){
+        for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(10);
             doc.setTextColor(150);

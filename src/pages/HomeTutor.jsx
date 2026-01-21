@@ -8,25 +8,25 @@ import useAuthenticatedUser from '../hooks/useAuthenticatedUser';
 function HomeTutor() {
     const navigate = useNavigate();
 
-   const { usuario, handleLogout } = useAuthenticatedUser();
+    const { usuario, handleLogout } = useAuthenticatedUser();
 
     const gradientStyle = {
         background: 'linear-gradient(90deg, #005bea 0%, #00c6fb 100%)',
         color: 'white'
     };
- 
+
     useEffect(() => {
         const savedUser = localStorage.getItem("usuarioLogado");
         const userParsed = savedUser ? JSON.parse(savedUser) : null;
 
-        if(!userParsed){
+        if (!userParsed) {
             navigate('/');
-        } else if(userParsed.role !== 'tutor'){
+        } else if (userParsed.role !== 'tutor') {
             alert("Acesso restrito: Você não tem permissão de tutor.");
 
-            if(userParsed.role === 'coordenador') navigate('/coordenador');
-            else if(userParsed.role === 'bolsista') navigate('/bolsista');
-            else if(userParsed.role === 'aluno') navigate('/aluno');
+            if (userParsed.role === 'coordenador') navigate('/coordenador');
+            else if (userParsed.role === 'bolsista') navigate('/bolsista');
+            else if (userParsed.role === 'aluno') navigate('/aluno');
             else navigate('/');
         }
     }, [navigate]);
@@ -45,20 +45,15 @@ function HomeTutor() {
             <Navbar bg="white" expand="lg" className="shadow-sm py-3">
                 <Container fluid className="px-5">
                     <Navbar.Brand href="#" className="d-flex align-items-center">
-                        <Image
-                            src={LogoNextCertify}
-                            alt="Logo NextCertify"
-                            height="40"
-                        />
+                        <Image src={LogoNextCertify} alt="Logo" height="40" />
                     </Navbar.Brand>
-
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="text-center mx-auto fw-medium">
-                            <Nav.Link href="/home-tutor" className="mx-2 text-dark">Home</Nav.Link>
-                            <Nav.Link href="/alunos-tutor" className="mx-2 text-dark">Alunos</Nav.Link>
-                            <Nav.Link href="/forms-tutor" className="mx-2 text-dark">Formulário de Acompanhamento</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/home-tutor')} className="mx-2 text-dark fw-bold" style={{ cursor: 'pointer' }}>Home</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/alunos-tutor')} className="mx-2 text-dark" style={{ cursor: 'pointer' }}>Alunos</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/forms-tutor')} className="mx-2 text-dark" style={{ cursor: 'pointer' }}>Formulário</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/relatorios-tutor')} className="mx-2 text-dark">Relatórios</Nav.Link>
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />
