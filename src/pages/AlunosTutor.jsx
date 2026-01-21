@@ -1,9 +1,9 @@
 import { Container, Row, Col, Button, Navbar, Nav, Badge, Image, Table } from 'react-bootstrap';
 import { FaBell, FaUserCircle, FaSignOutAlt, FaPen, FaFileAlt, FaEye } from 'react-icons/fa';
-import { useNavigate, useLocation } from 'react-router-dom'; // Adicionado useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import LogoNextCertify from '../img/NextCertify.png';
-import alunoTutor from '../mocks/aluno-tutor-mock.json';
+import mockAut from '../mocks/auth-mock.json';
 
 function AlunosTutor() {
     const navigate = useNavigate();

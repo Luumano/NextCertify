@@ -6,24 +6,32 @@ import { useState, useEffect } from 'react';
 
 function HomeAluno() {
     const navigate = useNavigate();
-    const [usuario, setUsuario] = useState(null);
+    const [usuario, setUsuario] = useState();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const savedUser = localStorage.getItem("usuarioLogado");
-        const userParsed = savedUser ? JSON.parse(savedUser) : null;
+        const userParsed = savedUser ? JSON.parse(savedUser) : null;
 
-        if (!userParsed) {
-            navigate('/');
-        } else if (userParsed.role !== 'aluno') {
-            alert("Acesso restrito: Você não tem permissão de aluno.");
-            const rotas = { tutor: '/home-tutor', bolsista: '/bolsista', coordenador: '/coordenador' };
-            navigate(rotas[userParsed.role] || '/');
-        } else {
-            setUsuario(userParsed); 
-        }
-    }, [navigate]);
+        if (!userParsed) {
+            navigate('/', { replace: true });
+            return;
+        }
 
+        if (userParsed.role !== 'aluno') {
+            const rotas = {
+                tutor: '/home-tutor',
+                bolsista: '/bolsista',
+                coordenador: '/coordenador'
+            };
+            navigate(rotas[userParsed.role] || '/', { replace: true });
+            return;
+        }
 
+        setUsuario(userParsed);
+        setLoading(false);
+    }, [navigate]);
+    
     const handleLogout = () => {
         localStorage.removeItem("usuarioLogado");
         navigate('/');
@@ -54,10 +62,10 @@ function HomeAluno() {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="text-center mx-auto fw-medium">
-                            <Nav.Link href="/aluno" className="mx-2 text-dark">Home</Nav.Link>
-                            <Nav.Link href="/meus-certificados" className="mx-2 text-dark">Certificados</Nav.Link>
-                            <Nav.Link href="/avaliacao-tutoria" className="mx-2 text-dark">Avaliação Tutoria</Nav.Link>
-                            <Nav.Link href="/contato" className="mx-2 text-dark">Contato</Nav.Link>
+                            <Nav.Link className="mx-2 text-dark fw-bold">Home</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/meus-certificados')} className="mx-2 text-dark">Certificados</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/avaliacao-tutoria')} className="mx-2 text-dark">Avaliação Tutoria</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/contato')} className="mx-2 text-dark">Contato</Nav.Link>
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
                             <FaBell size={20} className="text-primary" style={{ cursor: 'pointer' }} />

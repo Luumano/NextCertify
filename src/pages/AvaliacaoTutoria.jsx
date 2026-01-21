@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Navbar, Nav, Form, Image } from 'react-bootstrap';
-import { FaBell, FaUserCircle } from 'react-icons/fa';
+import { FaBell, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import LogoNextCertify from '../img/NextCertify.png';
-// Importe seu mock de usuários para listar os tutores
-import mockAut from '../mocks/auth-mock.json'; 
+import mockAut from '../mocks/auth-mock.json';
 
 function AvaliacaoTutoria() {
     const navigate = useNavigate();
@@ -14,23 +13,19 @@ function AvaliacaoTutoria() {
         return saved ? JSON.parse(saved) : null;
     });
 
-    const [listaTutores, setListaTutores] = useState([]);
+    //const [listaTutores, setListaTutores] = useState([]);
 
-    const [formData, setFormData] = useState(() => {
-        const today = new Date().toISOString().slice(0, 10);
-        return {
-            nome: usuario?.name || '', 
-            data: today,
-            email: usuario?.email || '',
+    const [formData, setFormData] = useState({
+            nome: '', 
+            data: new Date().toISOString().slice(0, 10),
+            email: '',
             curso: '',
             permanecer: 'sim',
-            experiencia: 50,
-            tutorId: '', // Novo campo
-            tutorNome: '', // Novo campo
+            experiencia: 50, 
+            tutorNome: 'Não atrubúido', 
             dificuldade: '',
             avaliacaoTutor: 50,
             descricao: ''
-        };
     });
 
     useEffect(() => {
@@ -41,13 +36,37 @@ function AvaliacaoTutoria() {
             navigate('/');
         }
 
-        // Carregar tutores do mock
+        const usuariosMock = Array.isArray(mockAut) ? mockAut : (mockAut.users || []);
+        const perfilMock = usuariosMock.find(u => u.email === usuario.email);
+        
+        //Buscar vínculos salvos na predefinições
+        const vinculosSalvos = JSON.parse(localStorage.getItem("vinculos_tutoria") || "[]");
+        const vinculoStorage = vinculosSalvos.find(v => v.alunoNome === usuario.name);
+        const tutorDefinido = vinculoStorage?.tutorNome || perfilMock?.tutor || 'Tutor não encontrado';
+        const cursoDefinido = usuario.curso || perfilMock?.curso || 'Curso não encontrado';
+
+        setFormData(prev => ({
+            ...prev,
+            nome: usuario.name,
+            email: usuario.email,
+            curso: cursoDefinido,
+            tutorNome: tutorDefinido
+        }));
+        /*Carregar tutores do mock
         const usuarios = Array.isArray(mockAut) ? mockAut : (mockAut.users || []);
         const tutoresEncontrados = usuarios.filter(u => u.role === 'tutor');
-        setListaTutores(tutoresEncontrados);
+        setListaTutores(tutoresEncontrados);*/
     }, [usuario, navigate]);
 
-    const handleChange = (e) => {
+        const handleChange = (e) => {
+            const { id, value } = e.target;
+            setFormData(prev => ({
+                ...prev,
+                [id]: value
+            }));
+        }  
+
+    /*const handleChange = (e) => {
         const { id, value } = e.target;
         
         // Lógica especial para salvar o nome do tutor junto com o ID
@@ -61,26 +80,44 @@ function AvaliacaoTutoria() {
         } else {
             setFormData({ ...formData, [id]: value });
         }
-    };
+    };*/
 
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        if (!formData.tutorId) {
-            alert("Por favor, selecione o tutor que acompanhou você.");
+        if(formData.tutorNome === 'Tutor não encontrado' || formData.tutorNome === 'Não atribuído'){
+            alert("Erro: Você não possui um tutor vinculado para avaliar.");
             return;
         }
 
         const avaliacaoSalvas = JSON.parse(localStorage.getItem("@App:avaliacao") || "[]");
+        const novaAvaliacao ={
+            ...formData,
+            id: Date.now()
+        };
+
+        /*if (!formData.tutorId) {
+            alert("Por favor, selecione o tutor que acompanhou você.");
+            return;
+        }*/
+
+        /*const avaliacaoSalvas = JSON.parse(localStorage.getItem("@App:avaliacao") || "[]");
         const novaAvaliacao = {
             ...formData,
             id: Date.now(),
-        };
+        };*/
 
-        const listaAtualizada = [...avaliacaoSalvas, novaAvaliacao];
+        /*const listaAtualizada = [...avaliacaoSalvas, novaAvaliacao];
         localStorage.setItem("@App:avaliacao", JSON.stringify(listaAtualizada));
-        alert(`Avaliação enviada com sucesso!`);
+        alert(`Avaliação enviada com sucesso!`);*/
+        localStorage.setItem("@App:avaliacao", JSON.stringify([...avaliacaoSalvas, novaAvaliacao]));
+        alert(`Avaliação para o tutor ${formData.tutorNome} enviado com sucesso!`);
         navigate('/aluno');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("usuarioLogado");
+        navigate('/');
     };
 
     const getBackgroundStyle = (value) => ({
@@ -96,10 +133,11 @@ function AvaliacaoTutoria() {
                         <Image src={LogoNextCertify} alt="Logo" height="40" />
                     </Navbar.Brand>
                     <Navbar.Collapse>
-                        <Nav className="mx-auto fw-medium">
-                            <Nav.Link href="/aluno">Home</Nav.Link>
-                            <Nav.Link href="/meus-certificados">Certificados</Nav.Link>
-                            <Nav.Link href="/contato">Contato</Nav.Link>
+                        <Nav className="text-center mx-auto fw-medium">
+                            <Nav.Link onClick={() => navigate('/aluno')} className="mx-2 text-dark">Home</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/meus-certificados')} className="mx-2 text-dark">Certificados</Nav.Link>
+                            <Nav.Link className="mx-2 text-dark fw-bold">Avaliação Tutoria</Nav.Link>
+                            <Nav.Link onClick={() => navigate('/contato')} className="mx-2 text-dark">Contato</Nav.Link>
                         </Nav>
                         <div className="d-flex align-items-center gap-3">
                             <FaBell size={20} className="text-primary" />
@@ -107,6 +145,7 @@ function AvaliacaoTutoria() {
                                 <FaUserCircle size={32} className="text-primary" />
                                 <span className="fw-bold">{formData.nome}</span>
                             </div>
+                            <Button variant="outline-danger" size="sim" className="d-flex align-items-center gap-2" onClick={handleLogout}><FaSignOutAlt size={16} /> Sair</Button>
                         </div>
                     </Navbar.Collapse>
                 </Container>
@@ -116,87 +155,44 @@ function AvaliacaoTutoria() {
                 <div className="mb-4 text-center text-md-start">
                     <h2 className="text-primary fw-bold">Avaliação do Projeto de Tutoria</h2>
                     <p className="text-muted">Sua opinião ajuda a melhorar o suporte acadêmico.</p>
+                    <p className="text-muted">Data da avaliação: <strong>{formData.data}</strong></p>
                 </div>
 
-                <Form onSubmit={handleSubmit}>
-                    {/* Seção Dados do Aluno */}
+                <Form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm">
                     <Row className="mb-3">
-                        <Col md={6} className="mb-3">
+                        <Col md={4} className="mb-3">
                             <Form.Label className="text-primary fw-bold">Aluno(a)</Form.Label>
                             <Form.Control value={formData.nome} disabled className="bg-light" />
                         </Col>
-                        <Col md={6}>
+                        <Col md={4}>
                             <Form.Label className="text-primary fw-bold">Curso</Form.Label>
-                            <Form.Select id="curso" value={formData.curso} onChange={handleChange} required>
-                                <option value="">Selecionar Curso</option>
-                                <option value="CC">Ciência da Computação</option>
-                                <option value="SI">Sistemas de Informação</option>
-                            </Form.Select>
+                            <Form.Control value={formData.curso} disabled className="bg-light" />
+                        </Col>
+                        <Col md={4}>
+                            <Form.Label className="text-primary fw-bold">Tutor Vinculado</Form.Label>
+                            <Form.Control value={formData.tutorNome} disabled className={`fw-bold ${formData.tutorNome === 'Tutor não encontrado' ? 'text-danger' : 'text-success'}`} />
                         </Col>
                     </Row>
 
-                    {/* SEÇÃO NOVA: SELEÇÃO DO TUTOR */}
                     <hr className="my-4" />
-                    <Row className="mb-4">
-                        <Col md={12}>
-                            <h5 className="text-primary fw-bold mb-3">Quem foi seu Tutor?</h5>
-                        </Col>
-                        <Col md={6}>
-                            <Form.Group>
-                                <Form.Label className="fw-bold">Selecione o Tutor acompanhante</Form.Label>
-                                <Form.Select 
-                                    id="tutorId" 
-                                    value={formData.tutorId} 
-                                    onChange={handleChange} 
-                                    required
-                                    style={{ border: '2px solid #0d6efd' }}
-                                >
-                                    <option value="">Clique para selecionar</option>
-                                    {listaTutores.map(t => (
-                                        <option key={t.matricula} value={t.matricula}>
-                                            {t.name}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-                        <Col md={6} className="d-flex align-items-end">
-                            <p className="text-muted small mb-2">
-                                * Se o seu tutor não estiver na lista, entre em contato com a coordenação.
-                            </p>
-                        </Col>
-                    </Row>
 
-                    {/* Avaliações em Range */}
                     <Row className="mb-4">
                         <Col md={6} className="mb-4">
                             <div className="d-flex justify-content-between">
-                                <Form.Label className="text-primary fw-bold">Nota para o Tutor: {formData.tutorNome}</Form.Label>
+                                <Form.Label className="text-primary fw-bold">Nota para o tutor: {formData.tutorNome}</Form.Label>
                                 <span className="badge bg-primary">{formData.avaliacaoTutor}%</span>
                             </div>
-                            <Form.Range
-                                id="avaliacaoTutor"
-                                min="0" max="100"
-                                value={formData.avaliacaoTutor}
-                                onChange={handleChange}
-                                style={getBackgroundStyle(formData.avaliacaoTutor)}
-                            />
+                            <Form.Range id="avaliacaoTutor" value={formData.avaliacaoTutor} onChange={handleChange} style={getBackgroundStyle(formData.avaliacaoTutor)} />
                         </Col>
                         <Col md={6}>
                             <div className="d-flex justify-content-between">
                                 <Form.Label className="text-primary fw-bold">Sua experiência geral</Form.Label>
                                 <span className="badge bg-primary">{formData.experiencia}%</span>
                             </div>
-                            <Form.Range
-                                id="experiencia"
-                                min="0" max="100"
-                                value={formData.experiencia}
-                                onChange={handleChange}
-                                style={getBackgroundStyle(formData.experiencia)}
-                            />
+                            <Form.Range id="experiencia" value={formData.experiencia} onChange={handleChange} style={getBackgroundStyle(formData.experiencia)} />
                         </Col>
                     </Row>
-
+                
                     {/* Dificuldades */}
                     <Row className="mb-4">
                         <Col md={6}>
@@ -227,7 +223,7 @@ function AvaliacaoTutoria() {
 
                     <div className="d-flex justify-content-end gap-2">
                         <Button variant="outline-secondary" onClick={() => navigate('/aluno')}>Cancelar</Button>
-                        <Button variant="primary" type="submit" className="px-5 fw-bold">Enviar Avaliação</Button>
+                        <Button variant="primary" type="submit" className="px-5 fw-bold" disabled={formData.tutorNome === 'Tutor não encontrado'}>Enviar Avaliação</Button>
                     </div>
                 </Form>
             </Container>
